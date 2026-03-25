@@ -2221,6 +2221,7 @@ h2 {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 8px;
+  z-index: 2;
   margin-top: 40px;
   min-height: 168px;
   padding: 28px 0 12px;
@@ -2229,6 +2230,8 @@ h2 {
 
 .footer-brand,
 .footer-socials {
+  position: relative;
+  z-index: 2;
   padding: 24px 0 0;
 }
 
@@ -2278,6 +2281,9 @@ h2 {
   text-decoration: none;
   border-bottom: 1px solid currentColor;
   padding-bottom: 1px;
+  position: relative;
+  z-index: 3;
+  pointer-events: auto;
 }
 
 .footer-legal-links a:hover,
@@ -2311,6 +2317,9 @@ h2 {
   background: rgba(255, 251, 246, 0.58);
   color: var(--text);
   text-decoration: none;
+  position: relative;
+  z-index: 3;
+  pointer-events: auto;
   transition:
     transform 180ms ease,
     border-color 180ms ease,
