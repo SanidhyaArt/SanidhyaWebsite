@@ -1486,7 +1486,9 @@ h2 {
 }
 
 .home-page-body .service-list-item:hover,
-.home-page-body .service-list-item:focus-visible {
+.home-page-body .service-list-item:focus-visible,
+.home-page-body .service-list-item:active,
+.home-page-body .service-list-item.is-jiggling {
   background: transparent;
   transform: translateX(4px);
 }
@@ -1499,6 +1501,17 @@ h2 {
 .home-page-body .service-name {
   color: #ffffff;
   font-size: clamp(1.3rem, 2vw, 2rem);
+}
+
+.home-page-body .service-list-item:hover .service-name,
+.home-page-body .service-list-item:focus-visible .service-name,
+.home-page-body .service-list-item:active .service-name,
+.home-page-body .service-list-item.is-jiggling .service-name,
+.services-page-body .service-list-item:hover .service-name,
+.services-page-body .service-list-item:focus-visible .service-name,
+.services-page-body .service-list-item:active .service-name,
+.services-page-body .service-list-item.is-jiggling .service-name {
+  animation: service-jiggle 360ms ease-in-out 1;
 }
 
 .service-summary-grid {
@@ -1819,7 +1832,9 @@ h2 {
 }
 
 .services-page-body .service-list-item:hover,
-.services-page-body .service-list-item:focus-visible {
+.services-page-body .service-list-item:focus-visible,
+.services-page-body .service-list-item:active,
+.services-page-body .service-list-item.is-jiggling {
   background: transparent;
   transform: translateX(4px);
 }

@@ -65,6 +65,7 @@ if (siteHeader && siteNav && headerContact && menuToggle) {
 }
 
 const cards = document.querySelectorAll(".service-card");
+const serviceListItems = document.querySelectorAll(".service-list-item");
 
 const revealCards = new IntersectionObserver(
   (entries) => {
@@ -83,6 +84,25 @@ const revealCards = new IntersectionObserver(
 cards.forEach((card, index) => {
   card.style.transitionDelay = `${index * 70}ms`;
   revealCards.observe(card);
+});
+
+serviceListItems.forEach((item) => {
+  let jiggleTimer = 0;
+
+  item.addEventListener(
+    "touchstart",
+    () => {
+      item.classList.remove("is-jiggling");
+      void item.offsetWidth;
+      item.classList.add("is-jiggling");
+
+      window.clearTimeout(jiggleTimer);
+      jiggleTimer = window.setTimeout(() => {
+        item.classList.remove("is-jiggling");
+      }, 380);
+    },
+    { passive: true }
+  );
 });
 
 const offeringGrids = document.querySelectorAll(".offerings-grid");
