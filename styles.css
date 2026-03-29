@@ -925,6 +925,35 @@ h2 {
   grid-column: 1 / -1;
 }
 
+.work-case-grid--retouching {
+  grid-template-areas:
+    "wedding wedding"
+    "skin watch"
+    "jewelry jewelry";
+  align-items: start;
+}
+
+.work-case-grid--retouching > .work-case-card,
+.work-case-grid--retouching > .work-case-card.is-wide {
+  grid-column: auto;
+}
+
+.work-case-grid--retouching > [data-retouching-case="wedding"] {
+  grid-area: wedding;
+}
+
+.work-case-grid--retouching > [data-retouching-case="skin"] {
+  grid-area: skin;
+}
+
+.work-case-grid--retouching > [data-retouching-case="watch"] {
+  grid-area: watch;
+}
+
+.work-case-grid--retouching > [data-retouching-case="jewelry"] {
+  grid-area: jewelry;
+}
+
 .work-case-media {
   position: relative;
   overflow: hidden;
@@ -939,6 +968,12 @@ h2 {
   min-height: 0;
   padding: 18px;
   background: transparent;
+}
+
+.work-case-grid--retouching .work-case-media-compare {
+  display: grid;
+  place-items: center;
+  padding: 24px;
 }
 
 .work-compare {
@@ -956,6 +991,20 @@ h2 {
 
 .work-compare.is-portrait {
   max-width: min(100%, 520px);
+  margin-inline: auto;
+}
+
+.work-case-grid--retouching [data-retouching-case="wedding"] .work-compare,
+.work-case-grid--retouching [data-retouching-case="jewelry"] .work-compare {
+  width: min(100%, 1080px);
+}
+
+.work-case-grid--retouching [data-retouching-case="skin"] .work-compare,
+.work-case-grid--retouching [data-retouching-case="watch"] .work-compare,
+.work-case-grid--retouching [data-retouching-case="skin"] .work-compare.is-portrait,
+.work-case-grid--retouching [data-retouching-case="watch"] .work-compare.is-portrait {
+  width: min(100%, 420px);
+  max-width: min(100%, 420px);
   margin-inline: auto;
 }
 
@@ -1062,6 +1111,10 @@ h2 {
   display: grid;
   gap: 10px;
   padding: 22px 24px 24px;
+}
+
+.work-case-grid--retouching .work-case-copy {
+  padding-top: 18px;
 }
 
 .work-case-copy h3,
@@ -2502,6 +2555,26 @@ h2 {
 
   .work-case-card.is-wide {
     grid-column: auto;
+  }
+
+  .work-case-grid--retouching {
+    grid-template-areas:
+      "wedding"
+      "skin"
+      "watch"
+      "jewelry";
+  }
+
+  .work-case-grid--retouching .work-case-media-compare {
+    padding: 18px;
+  }
+
+  .work-case-grid--retouching [data-retouching-case="skin"] .work-compare,
+  .work-case-grid--retouching [data-retouching-case="watch"] .work-compare,
+  .work-case-grid--retouching [data-retouching-case="skin"] .work-compare.is-portrait,
+  .work-case-grid--retouching [data-retouching-case="watch"] .work-compare.is-portrait {
+    width: min(100%, 460px);
+    max-width: min(100%, 460px);
   }
 
   .footer-brand,
