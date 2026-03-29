@@ -929,7 +929,7 @@ h2 {
   grid-template-areas:
     "wedding jewelry"
     "skin watch";
-  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: stretch;
 }
 
@@ -950,6 +950,10 @@ h2 {
   display: grid;
   grid-template-columns: minmax(310px, 1fr) minmax(240px, 0.9fr);
   align-items: stretch;
+}
+
+.work-case-grid--retouching > [data-retouching-case="watch"] {
+  grid-template-columns: minmax(340px, 1.08fr) minmax(210px, 0.82fr);
 }
 
 .work-case-grid--retouching > [data-retouching-case="wedding"] {
