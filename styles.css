@@ -935,7 +935,19 @@ h2 {
 
 .work-case-grid--retouching > .work-case-card,
 .work-case-grid--retouching > .work-case-card.is-wide {
+  display: grid;
   grid-column: auto;
+  align-items: stretch;
+}
+
+.work-case-grid--retouching > [data-retouching-case="wedding"],
+.work-case-grid--retouching > [data-retouching-case="jewelry"] {
+  grid-template-columns: minmax(0, 1.45fr) minmax(280px, 0.75fr);
+}
+
+.work-case-grid--retouching > [data-retouching-case="skin"],
+.work-case-grid--retouching > [data-retouching-case="watch"] {
+  grid-template-columns: minmax(260px, 380px) minmax(0, 1fr);
 }
 
 .work-case-grid--retouching > [data-retouching-case="wedding"] {
@@ -973,6 +985,9 @@ h2 {
 .work-case-grid--retouching .work-case-media-compare {
   display: grid;
   place-items: center;
+  align-self: stretch;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  border-bottom: none;
   padding: 24px;
 }
 
@@ -1003,8 +1018,8 @@ h2 {
 .work-case-grid--retouching [data-retouching-case="watch"] .work-compare,
 .work-case-grid--retouching [data-retouching-case="skin"] .work-compare.is-portrait,
 .work-case-grid--retouching [data-retouching-case="watch"] .work-compare.is-portrait {
-  width: min(100%, 420px);
-  max-width: min(100%, 420px);
+  width: 100%;
+  max-width: 100%;
   margin-inline: auto;
 }
 
@@ -1114,7 +1129,8 @@ h2 {
 }
 
 .work-case-grid--retouching .work-case-copy {
-  padding-top: 18px;
+  align-content: center;
+  padding: 28px 30px;
 }
 
 .work-case-copy h3,
@@ -2565,7 +2581,14 @@ h2 {
       "jewelry";
   }
 
+  .work-case-grid--retouching > .work-case-card,
+  .work-case-grid--retouching > .work-case-card.is-wide {
+    display: block;
+  }
+
   .work-case-grid--retouching .work-case-media-compare {
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
     padding: 18px;
   }
 
@@ -2575,6 +2598,10 @@ h2 {
   .work-case-grid--retouching [data-retouching-case="watch"] .work-compare.is-portrait {
     width: min(100%, 460px);
     max-width: min(100%, 460px);
+  }
+
+  .work-case-grid--retouching .work-case-copy {
+    padding: 22px 24px 24px;
   }
 
   .footer-brand,
