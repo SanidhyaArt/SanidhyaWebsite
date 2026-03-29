@@ -1043,13 +1043,52 @@ h2 {
 
 .work-feature-card[data-preview="retouching"] .work-feature-media,
 .work-case-card[data-preview="retouching"] .work-case-media {
-  background:
+  background-image:
     linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03)),
     radial-gradient(circle at 18% 24%, rgba(255, 210, 175, 0.22), transparent 30%),
     radial-gradient(circle at 76% 22%, rgba(240, 240, 240, 0.12), transparent 28%),
     radial-gradient(circle at 72% 76%, rgba(255, 155, 155, 0.18), transparent 30%),
     linear-gradient(135deg, rgba(17, 17, 17, 0.72) 0%, rgba(23, 23, 23, 0.58) 42%, rgba(30, 26, 24, 0.74) 100%),
-    center / cover no-repeat url("./assets/images/Wedding-Retouch.webp");
+    url("./assets/images/Wedding-Retouch.webp");
+  background-size: auto, auto, auto, auto, auto, 208% auto;
+  background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+  background-position: center, 18% 24%, 76% 22%, 72% 76%, center, 73% 24%;
+}
+
+.work-case-card[data-preview="retouching"] .work-case-media[data-retouch-case="wedding"] {
+  background-image:
+    linear-gradient(180deg, rgba(12, 12, 12, 0.12), rgba(12, 12, 12, 0.28)),
+    url("./assets/images/Wedding-Retouch.webp");
+  background-size: cover, 208% auto;
+  background-repeat: no-repeat, no-repeat;
+  background-position: center, 73% 24%;
+}
+
+.work-case-card[data-preview="retouching"] .work-case-media[data-retouch-case="skin"] {
+  background-image:
+    linear-gradient(180deg, rgba(12, 12, 12, 0.12), rgba(12, 12, 12, 0.28)),
+    url("./assets/images/Skin-Retouch.webp");
+  background-size: cover, 208% auto;
+  background-repeat: no-repeat, no-repeat;
+  background-position: center, 74% 34%;
+}
+
+.work-case-card[data-preview="retouching"] .work-case-media[data-retouch-case="jewelry"] {
+  background-image:
+    linear-gradient(180deg, rgba(12, 12, 12, 0.12), rgba(12, 12, 12, 0.28)),
+    url("./assets/images/Jewelry-Retouch.webp");
+  background-size: cover, 208% auto;
+  background-repeat: no-repeat, no-repeat;
+  background-position: center, 74% 48%;
+}
+
+.work-case-card[data-preview="retouching"] .work-case-media[data-retouch-case="watch"] {
+  background-image:
+    linear-gradient(180deg, rgba(12, 12, 12, 0.12), rgba(12, 12, 12, 0.28)),
+    url("./assets/images/Watch-Retouch.webp");
+  background-size: cover, 208% auto;
+  background-repeat: no-repeat, no-repeat;
+  background-position: center, 75% 50%;
 }
 
 .services-heading {
