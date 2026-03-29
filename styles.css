@@ -927,15 +927,20 @@ h2 {
 
 .work-case-grid--retouching {
   grid-template-areas:
-    "wedding wedding"
-    "skin watch"
-    "jewelry jewelry";
+    "wedding jewelry"
+    "skin watch";
+  grid-template-columns: minmax(0, 0.92fr) minmax(0, 1.08fr);
   align-items: start;
 }
 
 .work-case-grid--retouching > .work-case-card,
 .work-case-grid--retouching > .work-case-card.is-wide {
   grid-column: auto;
+  display: block;
+}
+
+.work-case-grid--retouching > [data-retouching-case="wedding"],
+.work-case-grid--retouching > [data-retouching-case="jewelry"] {
   display: block;
 }
 
@@ -1011,7 +1016,8 @@ h2 {
 
 .work-case-grid--retouching [data-retouching-case="wedding"] .work-compare,
 .work-case-grid--retouching [data-retouching-case="jewelry"] .work-compare {
-  width: min(100%, 1080px);
+  width: 100%;
+  max-width: 100%;
 }
 
 .work-case-grid--retouching [data-retouching-case="skin"] .work-compare,
@@ -2582,9 +2588,10 @@ h2 {
   .work-case-grid--retouching {
     grid-template-areas:
       "wedding"
+      "jewelry"
       "skin"
-      "watch"
-      "jewelry";
+      "watch";
+    grid-template-columns: 1fr;
   }
 
   .work-case-grid--retouching > .work-case-card,
