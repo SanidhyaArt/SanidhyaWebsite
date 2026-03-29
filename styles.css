@@ -1207,7 +1207,7 @@ h2 {
     radial-gradient(circle at 22% 24%, rgba(255, 214, 150, 0.22), transparent 32%),
     radial-gradient(circle at 78% 20%, rgba(255, 118, 118, 0.18), transparent 28%),
     linear-gradient(135deg, rgba(18, 18, 18, 0.68) 0%, rgba(28, 22, 24, 0.52) 42%, rgba(34, 25, 21, 0.72) 100%),
-    center / cover no-repeat url("./assets/images/youtube-thumbnail.webp");
+    linear-gradient(160deg, rgba(9, 9, 9, 0.88), rgba(20, 14, 15, 0.68));
 }
 
 .work-case-card[data-preview="brand-identity"][data-brand-media="thumbnail"] .work-case-media {
