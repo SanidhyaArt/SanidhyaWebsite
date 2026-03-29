@@ -105,6 +105,76 @@ serviceListItems.forEach((item) => {
   );
 });
 
+const compareSliders = document.querySelectorAll("[data-compare-slider]");
+
+compareSliders.forEach((slider) => {
+  const range = slider.querySelector(".work-compare-range");
+  const beforeImage = slider.querySelector(".work-compare-image--before");
+  const afterImage = slider.querySelector(".work-compare-image--after");
+
+  if (!range || !beforeImage || !afterImage) {
+    return;
+  }
+
+  const setPosition = (value) => {
+    slider.style.setProperty("--compare-position", `${value}%`);
+  };
+
+  const loadImageWithFallback = (image) => {
+    const primary = image.dataset.primary;
+    const fallback = image.dataset.fallback;
+
+    if (!primary && !fallback) {
+      return;
+    }
+
+    let hasTriedFallback = false;
+
+    image.addEventListener("error", () => {
+      if (!fallback || hasTriedFallback || image.src.endsWith(fallback)) {
+        return;
+      }
+
+      hasTriedFallback = true;
+      image.src = fallback;
+    });
+
+    image.src = primary || fallback;
+  };
+
+  const syncAspectRatio = () => {
+    const sourceImage = afterImage.naturalWidth ? afterImage : beforeImage;
+
+    if (!sourceImage.naturalWidth || !sourceImage.naturalHeight) {
+      return;
+    }
+
+    slider.style.setProperty(
+      "--compare-aspect",
+      `${sourceImage.naturalWidth} / ${sourceImage.naturalHeight}`
+    );
+    slider.classList.toggle(
+      "is-portrait",
+      sourceImage.naturalHeight > sourceImage.naturalWidth
+    );
+  };
+
+  setPosition(range.value || slider.dataset.compareStart || 50);
+  range.addEventListener("input", () => {
+    setPosition(range.value);
+  });
+
+  [beforeImage, afterImage].forEach((image) => {
+    loadImageWithFallback(image);
+
+    if (image.complete) {
+      syncAspectRatio();
+    } else {
+      image.addEventListener("load", syncAspectRatio);
+    }
+  });
+});
+
 const offeringGrids = document.querySelectorAll(".offerings-grid");
 const revealTimers = new WeakMap();
 

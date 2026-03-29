@@ -935,6 +935,129 @@ h2 {
   background-size: cover;
 }
 
+.work-case-media-compare {
+  min-height: 0;
+  padding: 18px;
+  background: transparent;
+}
+
+.work-compare {
+  --compare-position: 50%;
+  --compare-aspect: 4 / 3;
+  position: relative;
+  width: 100%;
+  aspect-ratio: var(--compare-aspect);
+  overflow: hidden;
+  border-radius: calc(var(--radius-lg) + 2px);
+  background:
+    linear-gradient(180deg, rgba(14, 14, 14, 0.94), rgba(18, 18, 18, 0.9)),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.04), transparent);
+}
+
+.work-compare.is-portrait {
+  max-width: min(100%, 520px);
+  margin-inline: auto;
+}
+
+.work-compare-stage {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.work-compare-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.work-compare-before {
+  position: absolute;
+  inset: 0;
+  clip-path: inset(0 calc(100% - var(--compare-position)) 0 0);
+}
+
+.work-compare-divider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--compare-position);
+  width: 2px;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: 0 0 0 1px rgba(10, 10, 10, 0.24);
+  pointer-events: none;
+}
+
+.work-compare-handle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 54px;
+  height: 54px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.36);
+  background: rgba(9, 9, 9, 0.72);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 16px 30px rgba(0, 0, 0, 0.3);
+}
+
+.work-compare-handle::before,
+.work-compare-handle::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 10px;
+  height: 10px;
+  border-top: 2px solid #ffffff;
+  border-right: 2px solid #ffffff;
+}
+
+.work-compare-handle::before {
+  left: 17px;
+  transform: translateY(-50%) rotate(-135deg);
+}
+
+.work-compare-handle::after {
+  right: 17px;
+  transform: translateY(-50%) rotate(45deg);
+}
+
+.work-compare-label {
+  position: absolute;
+  top: 16px;
+  z-index: 2;
+  padding: 7px 10px;
+  border-radius: 999px;
+  background: rgba(9, 9, 9, 0.58);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.work-compare-label--before {
+  left: 16px;
+}
+
+.work-compare-label--after {
+  right: 16px;
+}
+
+.work-compare-range {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: ew-resize;
+}
+
 .work-case-copy {
   display: grid;
   gap: 10px;
@@ -1053,42 +1176,6 @@ h2 {
   background-size: auto, auto, auto, auto, auto, 208% auto;
   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
   background-position: center, 18% 24%, 76% 22%, 72% 76%, center, 73% 24%;
-}
-
-.work-case-card[data-preview="retouching"] .work-case-media[data-retouch-case="wedding"] {
-  background-image:
-    linear-gradient(180deg, rgba(12, 12, 12, 0.12), rgba(12, 12, 12, 0.28)),
-    url("./assets/images/Wedding-Retouch.webp");
-  background-size: cover, 208% auto;
-  background-repeat: no-repeat, no-repeat;
-  background-position: center, 73% 24%;
-}
-
-.work-case-card[data-preview="retouching"] .work-case-media[data-retouch-case="skin"] {
-  background-image:
-    linear-gradient(180deg, rgba(12, 12, 12, 0.12), rgba(12, 12, 12, 0.28)),
-    url("./assets/images/Skin-Retouch.webp");
-  background-size: cover, 208% auto;
-  background-repeat: no-repeat, no-repeat;
-  background-position: center, 74% 34%;
-}
-
-.work-case-card[data-preview="retouching"] .work-case-media[data-retouch-case="jewelry"] {
-  background-image:
-    linear-gradient(180deg, rgba(12, 12, 12, 0.12), rgba(12, 12, 12, 0.28)),
-    url("./assets/images/Jewelry-Retouch.webp");
-  background-size: cover, 208% auto;
-  background-repeat: no-repeat, no-repeat;
-  background-position: center, 74% 48%;
-}
-
-.work-case-card[data-preview="retouching"] .work-case-media[data-retouch-case="watch"] {
-  background-image:
-    linear-gradient(180deg, rgba(12, 12, 12, 0.12), rgba(12, 12, 12, 0.28)),
-    url("./assets/images/Watch-Retouch.webp");
-  background-size: cover, 208% auto;
-  background-repeat: no-repeat, no-repeat;
-  background-position: center, 75% 50%;
 }
 
 .services-heading {
