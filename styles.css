@@ -1201,7 +1201,7 @@ h2 {
   background: transparent;
 }
 
-.work-case-card[data-brand-media="title-card"] .work-case-media {
+.work-case-card[data-preview="brand-identity"][data-brand-media="title-card"] .work-case-media {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.02)),
     radial-gradient(circle at 22% 24%, rgba(255, 214, 150, 0.22), transparent 32%),
@@ -1210,7 +1210,7 @@ h2 {
     center / cover no-repeat url("./assets/images/youtube-thumbnail.webp");
 }
 
-.work-case-card[data-brand-media="thumbnail"] .work-case-media {
+.work-case-card[data-preview="brand-identity"][data-brand-media="thumbnail"] .work-case-media {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03)),
     radial-gradient(circle at 20% 22%, rgba(255, 224, 173, 0.22), transparent 34%),
@@ -1219,7 +1219,7 @@ h2 {
     center / cover no-repeat url("./assets/images/youtube-thumbnail.webp");
 }
 
-.work-case-card[data-brand-media="rollout"] .work-case-media {
+.work-case-card[data-preview="brand-identity"][data-brand-media="rollout"] .work-case-media {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03)),
     radial-gradient(circle at 18% 24%, rgba(255, 226, 173, 0.18), transparent 30%),
