@@ -26,6 +26,293 @@ const backgroundMediaVariants = {
     rollout: "/assets/images/brand-identity-rollout-01.webp",
   },
 };
+const predictivePreloadModuleSources = [
+  "/behaviorStore.js",
+  "/sessionTracker.js",
+  "/scrollTracker.js",
+  "/cursorTracker.js",
+  "/viewportPredictor.js",
+  "/rankingEngine.js",
+  "/preloadManager.js",
+];
+const predictivePreviewMeta = {
+  "brand-identity": {
+    category: "Brand Identity",
+    tags: ["branding", "logo", "systems"],
+    assets: [
+      "/assets/images/youtube-thumbnail.webp",
+      "/assets/videos/movie-title-card.mp4",
+      "/assets/images/brand-identity-rollout-01.webp",
+    ],
+    basePriority: 0.76,
+  },
+  "campaign-design": {
+    category: "Campaign Design",
+    tags: ["campaign", "poster", "ads"],
+    assets: ["/assets/images/campaign-design.jpg"],
+    basePriority: 0.72,
+  },
+  illustration: {
+    category: "Illustration",
+    tags: ["illustration", "editorial", "visual-development"],
+    assets: ["/assets/images/illustration.jpg"],
+    basePriority: 0.66,
+  },
+  "game-art": {
+    category: "Game Art",
+    tags: ["game-ui", "icons", "concept-art"],
+    assets: ["/assets/images/game-art.jpg"],
+    basePriority: 0.68,
+  },
+  "motion-design": {
+    category: "Motion Design",
+    tags: ["motion", "video", "explainer"],
+    assets: ["/assets/images/motion-design.jpg"],
+    basePriority: 0.7,
+  },
+  "three-d-visualization": {
+    category: "3D Visualization",
+    tags: ["3d", "product", "render"],
+    assets: ["/assets/images/three-d-visualization.jpg"],
+    basePriority: 0.74,
+  },
+  "architectural-visualization": {
+    category: "Architectural Visualization",
+    tags: ["archviz", "interior", "spatial"],
+    assets: ["/assets/images/architectural-visualization.jpg"],
+    basePriority: 0.7,
+  },
+  retouching: {
+    category: "Retouching",
+    tags: ["retouching", "beauty", "commercial"],
+    assets: [
+      "/assets/images/retouching-wedding-after.webp",
+      "/assets/images/retouching-skin-after.webp",
+      "/assets/images/retouching-jewelry-after.webp",
+      "/assets/images/retouching-watch-after.webp",
+    ],
+    basePriority: 0.74,
+  },
+};
+const predictiveRouteMeta = {
+  "/": {
+    id: "page:home",
+    category: "Overview",
+    tags: ["home", "portfolio", "overview"],
+    assets: ["/assets/videos/site-background.mp4"],
+    basePriority: 0.56,
+  },
+  "/services": {
+    id: "page:services",
+    category: "Services",
+    tags: ["services", "offerings", "overview"],
+    assets: ["/assets/videos/site-background.mp4"],
+    basePriority: 0.62,
+  },
+  "/work": {
+    id: "page:work",
+    category: "Work",
+    tags: ["work", "projects", "portfolio"],
+    assets: ["/assets/images/three-d-visualization.jpg"],
+    basePriority: 0.68,
+  },
+  "/about": {
+    id: "page:about",
+    category: "About",
+    tags: ["about", "profile", "approach"],
+    assets: ["/assets/videos/site-background.mp4"],
+    basePriority: 0.42,
+  },
+  "/contact": {
+    id: "page:contact",
+    category: "Conversion",
+    tags: ["contact", "inquiry", "brief"],
+    assets: ["/assets/videos/site-background.mp4"],
+    basePriority: 0.7,
+  },
+  "/freebies": {
+    id: "page:freebies",
+    category: "Resources",
+    tags: ["freebies", "resources", "downloads"],
+    assets: ["/assets/videos/site-background.mp4"],
+    basePriority: 0.36,
+  },
+  "/brand-identity": {
+    id: "service:brand-identity",
+    ...predictivePreviewMeta["brand-identity"],
+  },
+  "/campaign-design": {
+    id: "service:campaign-design",
+    ...predictivePreviewMeta["campaign-design"],
+  },
+  "/illustration": {
+    id: "service:illustration",
+    ...predictivePreviewMeta.illustration,
+  },
+  "/game-art": {
+    id: "service:game-art",
+    ...predictivePreviewMeta["game-art"],
+  },
+  "/motion-design": {
+    id: "service:motion-design",
+    ...predictivePreviewMeta["motion-design"],
+  },
+  "/three-d-visualization": {
+    id: "service:three-d-visualization",
+    ...predictivePreviewMeta["three-d-visualization"],
+  },
+  "/architectural-visualization": {
+    id: "service:architectural-visualization",
+    ...predictivePreviewMeta["architectural-visualization"],
+  },
+  "/retouching": {
+    id: "service:retouching",
+    ...predictivePreviewMeta.retouching,
+  },
+  "/brand-identity-systems-work": {
+    id: "work:brand-identity-systems",
+    ...predictivePreviewMeta["brand-identity"],
+    basePriority: 0.8,
+  },
+  "/campaign-visuals": {
+    id: "work:campaign-visuals",
+    ...predictivePreviewMeta["campaign-design"],
+    basePriority: 0.78,
+  },
+  "/editorial-illustration": {
+    id: "work:editorial-illustration",
+    ...predictivePreviewMeta.illustration,
+    basePriority: 0.74,
+  },
+  "/game-ui-icons": {
+    id: "work:game-ui-icons",
+    ...predictivePreviewMeta["game-art"],
+    basePriority: 0.74,
+  },
+  "/explainer-videos": {
+    id: "work:explainer-videos",
+    ...predictivePreviewMeta["motion-design"],
+    basePriority: 0.76,
+  },
+  "/product-renders": {
+    id: "work:product-renders",
+    ...predictivePreviewMeta["three-d-visualization"],
+    basePriority: 0.8,
+  },
+  "/arch-viz-work": {
+    id: "work:arch-viz",
+    ...predictivePreviewMeta["architectural-visualization"],
+    basePriority: 0.76,
+  },
+  "/high-end-retouching": {
+    id: "work:high-end-retouching",
+    ...predictivePreviewMeta.retouching,
+    basePriority: 0.8,
+  },
+};
+const predictiveRegistrationQueue = [];
+
+const loadPredictivePreloadModule = (source) =>
+  new Promise((resolve, reject) => {
+    const existing = document.querySelector(`script[data-predictive-module="${source}"]`);
+
+    if (existing) {
+      if (existing.dataset.loaded === "true") {
+        resolve();
+        return;
+      }
+
+      existing.addEventListener("load", () => resolve(), { once: true });
+      existing.addEventListener("error", () => reject(new Error(`Failed to load ${source}`)), {
+        once: true,
+      });
+      return;
+    }
+
+    const script = document.createElement("script");
+    script.src = source;
+    script.async = false;
+    script.defer = true;
+    script.dataset.predictiveModule = source;
+    script.addEventListener(
+      "load",
+      () => {
+        script.dataset.loaded = "true";
+        resolve();
+      },
+      { once: true }
+    );
+    script.addEventListener(
+      "error",
+      () => {
+        reject(new Error(`Failed to load ${source}`));
+      },
+      { once: true }
+    );
+    document.head.append(script);
+  });
+
+const flushPredictiveRegistrations = () => {
+  if (!window.predictivePreload?.registerPreloadTarget) {
+    return;
+  }
+
+  while (predictiveRegistrationQueue.length) {
+    const queuedTarget = predictiveRegistrationQueue.shift();
+
+    if (!queuedTarget?.element?.isConnected) {
+      continue;
+    }
+
+    window.predictivePreload.registerPreloadTarget(
+      queuedTarget.element,
+      queuedTarget.options
+    );
+  }
+};
+
+const registerPredictiveTarget = (element, options = {}) => {
+  if (!element || !options.id) {
+    return;
+  }
+
+  if (window.predictivePreload?.registerPreloadTarget) {
+    window.predictivePreload.registerPreloadTarget(element, options);
+    return;
+  }
+
+  predictiveRegistrationQueue.push({ element, options });
+};
+
+const initializePredictivePreloading = async () => {
+  try {
+    for (const moduleSource of predictivePreloadModuleSources) {
+      await loadPredictivePreloadModule(moduleSource);
+    }
+
+    if (!window.predictivePreload && typeof window.createPredictivePreloadingSystem === "function") {
+      window.predictivePreload = window.createPredictivePreloadingSystem({
+        weights: {
+          distance: 0.22,
+          direction: 0.12,
+          velocity: 0.08,
+          cursor: 0.2,
+          heatmap: 0.16,
+          session: 0.16,
+          base: 0.06,
+        },
+      });
+    }
+
+    flushPredictiveRegistrations();
+  } catch (error) {
+    return null;
+  }
+
+  return window.predictivePreload || null;
+};
+
+const predictivePreloadReady = initializePredictivePreloading();
 
 const getStoredLocale = () => {
   try {
@@ -74,6 +361,62 @@ const normalizeLocalePath = (pathname = window.location.pathname) => {
   }
 
   return normalizedPath || "/";
+};
+
+const getPredictiveRouteMeta = (href = "") => {
+  let normalizedPath = "/";
+
+  try {
+    normalizedPath = normalizeLocalePath(
+      new URL(href || "/", window.location.href).pathname
+    );
+  } catch (error) {
+    normalizedPath = normalizeLocalePath(href || "/");
+  }
+
+  const directMatch = predictiveRouteMeta[normalizedPath];
+
+  if (directMatch) {
+    return {
+      ...directMatch,
+      href: normalizedPath,
+    };
+  }
+
+  const matchedEntry = Object.entries(predictiveRouteMeta).find(([path]) =>
+    normalizedPath.startsWith(path) && path !== "/"
+  );
+
+  if (!matchedEntry) {
+    return {
+      id: `page:${normalizedPath.replace(/\//g, "-") || "home"}`,
+      href: normalizedPath,
+      category: "Page",
+      tags: ["page"],
+      assets: [],
+      basePriority: 0.38,
+    };
+  }
+
+  return {
+    ...matchedEntry[1],
+    href: normalizedPath,
+  };
+};
+
+const getPredictivePreviewConfig = (preview = "") => {
+  return predictivePreviewMeta[preview] || {
+    category: "Work",
+    tags: ["portfolio", "project"],
+    assets: [],
+    basePriority: 0.5,
+  };
+};
+
+const getCompareAssetsForCase = (card) => {
+  return Array.from(card.querySelectorAll(".work-compare-image"))
+    .flatMap((image) => [image.dataset.primary, image.dataset.fallback])
+    .filter(Boolean);
 };
 
 const currentLocalePath = normalizeLocalePath();
