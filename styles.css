@@ -2655,6 +2655,17 @@ h2 {
   gap: 8px;
 }
 
+.terms-card a[href^="mailto:"] {
+  color: rgba(244, 216, 182, 0.92);
+  text-decoration-color: rgba(244, 216, 182, 0.4);
+}
+
+.terms-card a[href^="mailto:"]:hover,
+.terms-card a[href^="mailto:"]:focus-visible {
+  color: rgba(255, 232, 205, 0.98);
+  text-decoration-color: rgba(255, 232, 205, 0.72);
+}
+
 .terms-fine-print {
   font-size: 0.94rem;
   opacity: 0.88;
