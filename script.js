@@ -7,6 +7,25 @@ document.querySelectorAll(".brand-name").forEach((brandName) => {
 const localeStorageKey = "locale";
 const localeSuggestionDismissKey = "locale-suggestion-dismissed";
 const pageLocale = document.documentElement.dataset.pageLocale || "en";
+const prefersReducedMotion =
+  window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
+const analyticsEndpoint = "/api/track";
+const backgroundMediaSources = {
+  "brand-identity": "/assets/images/youtube-thumbnail.webp",
+  "campaign-design": "/assets/images/campaign-design.jpg",
+  illustration: "/assets/images/illustration.jpg",
+  "game-art": "/assets/images/game-art.jpg",
+  "motion-design": "/assets/images/motion-design.jpg",
+  "three-d-visualization": "/assets/images/three-d-visualization.jpg",
+  "architectural-visualization": "/assets/images/architectural-visualization.jpg",
+  retouching: "/assets/images/retouching-wedding-after.webp",
+};
+const backgroundMediaVariants = {
+  "brand-identity": {
+    thumbnail: "/assets/images/youtube-thumbnail.webp",
+    rollout: "/assets/images/brand-identity-rollout-01.webp",
+  },
+};
 
 const getStoredLocale = () => {
   try {
@@ -201,6 +220,319 @@ const initializeLanguageSuggestion = async () => {
 void initializePageTranslation();
 void initializeLanguageSuggestion();
 
+const trackEvent = (eventName, payload = {}) => {
+  if (!eventName) {
+    return;
+  }
+
+  const eventPayload = {
+    event: eventName,
+    path: window.location.pathname,
+    locale: pageLocale,
+    timestamp: new Date().toISOString(),
+    ...payload,
+  };
+
+  const body = JSON.stringify(eventPayload);
+
+  try {
+    if (navigator.sendBeacon) {
+      const blob = new Blob([body], { type: "application/json" });
+      const sent = navigator.sendBeacon(analyticsEndpoint, blob);
+
+      if (sent) {
+        return;
+      }
+    }
+  } catch (error) {
+    // Fall through to fetch.
+  }
+
+  void fetch(analyticsEndpoint, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body,
+    keepalive: true,
+    cache: "no-store",
+  }).catch(() => {});
+};
+
+const bindTrackedClick = (element, eventName, getPayload) => {
+  if (!element) {
+    return;
+  }
+
+  element.addEventListener("click", () => {
+    trackEvent(eventName, typeof getPayload === "function" ? getPayload() : {});
+  });
+};
+
+const initializeTrackedClicks = () => {
+  document.querySelectorAll('[data-track="hire-me"]').forEach((element) => {
+    bindTrackedClick(element, "hire_me_click", () => ({
+      label: element.textContent.trim(),
+      href: element.getAttribute("href") || "",
+    }));
+  });
+};
+
+const initializeScrollDepthTracking = () => {
+  const thresholds = [25, 50, 75, 100];
+  const sessionKey = `scroll-depth:${window.location.pathname}`;
+  const trackedThresholds = new Set();
+
+  try {
+    const stored = JSON.parse(window.sessionStorage.getItem(sessionKey) || "[]");
+    if (Array.isArray(stored)) {
+      stored.forEach((value) => trackedThresholds.add(value));
+    }
+  } catch (error) {
+    // Ignore session storage parsing issues.
+  }
+
+  let scrollFrame = 0;
+
+  const persistThresholds = () => {
+    try {
+      window.sessionStorage.setItem(
+        sessionKey,
+        JSON.stringify(Array.from(trackedThresholds))
+      );
+    } catch (error) {
+      return;
+    }
+  };
+
+  const measureScrollDepth = () => {
+    const maxScroll = Math.max(
+      document.documentElement.scrollHeight - window.innerHeight,
+      0
+    );
+    const progress =
+      maxScroll === 0 ? 100 : Math.round((window.scrollY / maxScroll) * 100);
+
+    thresholds.forEach((threshold) => {
+      if (progress < threshold || trackedThresholds.has(threshold)) {
+        return;
+      }
+
+      trackedThresholds.add(threshold);
+      persistThresholds();
+      trackEvent("scroll_depth", { depth: threshold });
+    });
+  };
+
+  const onScroll = () => {
+    window.cancelAnimationFrame(scrollFrame);
+    scrollFrame = window.requestAnimationFrame(measureScrollDepth);
+  };
+
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll);
+  measureScrollDepth();
+};
+
+const animateScrollTo = (targetY, duration = 720) => {
+  if (prefersReducedMotion) {
+    window.scrollTo(0, targetY);
+    return;
+  }
+
+  const startY = window.scrollY;
+  const delta = targetY - startY;
+  const startTime = performance.now();
+  const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+  const step = (currentTime) => {
+    const elapsed = currentTime - startTime;
+    const progress = Math.min(elapsed / duration, 1);
+    const eased = easeOutCubic(progress);
+
+    window.scrollTo(0, startY + delta * eased);
+
+    if (progress < 1) {
+      window.requestAnimationFrame(step);
+    }
+  };
+
+  window.requestAnimationFrame(step);
+};
+
+const initializeSmoothScrollAnchors = () => {
+  if (prefersReducedMotion) {
+    return;
+  }
+
+  document.querySelectorAll('a[href*="#"]').forEach((link) => {
+    let targetUrl;
+
+    try {
+      targetUrl = new URL(link.getAttribute("href"), window.location.href);
+    } catch (error) {
+      return;
+    }
+
+    if (
+      !targetUrl.hash ||
+      targetUrl.origin !== window.location.origin ||
+      targetUrl.pathname !== window.location.pathname
+    ) {
+      return;
+    }
+
+    const targetId = decodeURIComponent(targetUrl.hash.slice(1));
+
+    link.addEventListener("click", (event) => {
+      const targetElement =
+        document.getElementById(targetId) ||
+        document.querySelector(targetUrl.hash);
+
+      if (!targetElement) {
+        return;
+      }
+
+      event.preventDefault();
+
+      const headerOffset = (document.querySelector(".site-header")?.offsetHeight || 0) + 18;
+      const targetY = Math.max(
+        targetElement.getBoundingClientRect().top + window.scrollY - headerOffset,
+        0
+      );
+
+      animateScrollTo(targetY);
+      history.pushState(null, "", targetUrl.hash);
+    });
+  });
+};
+
+const markShellLoading = (shell) => {
+  if (!shell) {
+    return;
+  }
+
+  shell.classList.add("progressive-media-shell", "is-media-loading");
+  shell.classList.remove("is-media-loaded");
+};
+
+const markShellLoaded = (shell) => {
+  if (!shell) {
+    return;
+  }
+
+  shell.classList.remove("is-media-loading");
+  shell.classList.add("is-media-loaded");
+};
+
+const mediaObserver =
+  "IntersectionObserver" in window
+    ? new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (!entry.isIntersecting) {
+              return;
+            }
+
+            entry.target.dispatchEvent(new CustomEvent("progressive:enter"));
+            mediaObserver.unobserve(entry.target);
+          });
+        },
+        {
+          rootMargin: "240px 0px",
+          threshold: 0.01,
+        }
+      )
+    : null;
+
+const observeMediaLoad = (shell, onEnter) => {
+  if (!shell) {
+    onEnter();
+    return;
+  }
+
+  if (!mediaObserver) {
+    onEnter();
+    return;
+  }
+
+  const handleEnter = () => {
+    shell.removeEventListener("progressive:enter", handleEnter);
+    onEnter();
+  };
+
+  shell.addEventListener("progressive:enter", handleEnter);
+  mediaObserver.observe(shell);
+};
+
+const preloadBackgroundShell = (shell, source) => {
+  if (!shell || !source) {
+    return;
+  }
+
+  markShellLoading(shell);
+
+  const preloadImage = new Image();
+  const finish = () => {
+    markShellLoaded(shell);
+  };
+
+  preloadImage.addEventListener("load", finish, { once: true });
+  preloadImage.addEventListener("error", finish, { once: true });
+  preloadImage.src = source;
+
+  if (preloadImage.complete) {
+    finish();
+  }
+};
+
+const initializeProgressiveCaseMedia = () => {
+  document.querySelectorAll(".work-case-video").forEach((video) => {
+    const shell = video.closest(".work-case-media");
+
+    if (!shell) {
+      return;
+    }
+
+    markShellLoading(shell);
+    video.classList.add("progressive-video");
+    video.preload = video.getAttribute("preload") || "metadata";
+
+    const onReady = () => {
+      video.classList.add("is-media-loaded");
+      markShellLoaded(shell);
+    };
+
+    if (video.readyState >= 2) {
+      onReady();
+      return;
+    }
+
+    video.addEventListener("loadeddata", onReady, { once: true });
+    video.addEventListener("error", onReady, { once: true });
+  });
+
+  document.querySelectorAll(".work-case-card[data-preview] .work-case-media").forEach((shell) => {
+    if (shell.querySelector(".work-case-video")) {
+      return;
+    }
+
+    const card = shell.closest(".work-case-card");
+    const preview = card?.dataset.preview || "";
+    const variant = card?.dataset.brandMedia || "";
+    const source =
+      backgroundMediaVariants[preview]?.[variant] || backgroundMediaSources[preview];
+
+    preloadBackgroundShell(shell, source);
+  });
+};
+
+initializeTrackedClicks();
+initializeScrollDepthTracking();
+initializeSmoothScrollAnchors();
+initializeProgressiveCaseMedia();
+
 const siteHeader = document.querySelector(".site-header");
 const siteNav = document.querySelector(".site-nav");
 const headerContact = document.querySelector(".header-contact");
@@ -264,6 +596,16 @@ if (siteHeader && siteNav && headerContact && menuToggle) {
 const cards = document.querySelectorAll(".service-card");
 const serviceListItems = document.querySelectorAll(".service-list-item");
 
+document.querySelectorAll("img").forEach((image) => {
+  if (!image.hasAttribute("loading")) {
+    image.loading = "lazy";
+  }
+
+  if (!image.hasAttribute("decoding")) {
+    image.decoding = "async";
+  }
+});
+
 const revealCards = new IntersectionObserver(
   (entries) => {
     for (const entry of entries) {
@@ -317,11 +659,37 @@ compareSliders.forEach((slider) => {
     slider.style.setProperty("--compare-position", `${value}%`);
   };
 
+  markShellLoading(slider);
+
+  [beforeImage, afterImage].forEach((image) => {
+    image.classList.add("progressive-media");
+    image.loading = image.getAttribute("loading") || "lazy";
+    image.decoding = image.getAttribute("decoding") || "async";
+  });
+
+  let settledImages = 0;
+  let startedLoading = false;
+
+  const markImageSettled = (image) => {
+    if (image.dataset.mediaSettled === "true") {
+      return;
+    }
+
+    image.dataset.mediaSettled = "true";
+    image.classList.add("is-media-loaded");
+    settledImages += 1;
+
+    if (settledImages >= 2) {
+      markShellLoaded(slider);
+    }
+  };
+
   const loadImageWithFallback = (image) => {
     const primary = image.dataset.primary;
     const fallback = image.dataset.fallback;
 
     if (!primary && !fallback) {
+      markImageSettled(image);
       return;
     }
 
@@ -329,6 +697,7 @@ compareSliders.forEach((slider) => {
 
     image.addEventListener("error", () => {
       if (!fallback || hasTriedFallback || image.src.endsWith(fallback)) {
+        markImageSettled(image);
         return;
       }
 
@@ -336,7 +705,17 @@ compareSliders.forEach((slider) => {
       image.src = fallback;
     });
 
+    image.addEventListener("load", () => {
+      syncAspectRatio();
+      markImageSettled(image);
+    });
+
     image.src = primary || fallback;
+
+    if (image.complete && image.naturalWidth) {
+      syncAspectRatio();
+      markImageSettled(image);
+    }
   };
 
   const syncAspectRatio = () => {
@@ -361,14 +740,16 @@ compareSliders.forEach((slider) => {
     setPosition(range.value);
   });
 
-  [beforeImage, afterImage].forEach((image) => {
-    loadImageWithFallback(image);
-
-    if (image.complete) {
-      syncAspectRatio();
-    } else {
-      image.addEventListener("load", syncAspectRatio);
+  observeMediaLoad(slider, () => {
+    if (startedLoading) {
+      return;
     }
+
+    startedLoading = true;
+
+    [beforeImage, afterImage].forEach((image) => {
+      loadImageWithFallback(image);
+    });
   });
 });
 
@@ -664,6 +1045,16 @@ if (
     card.dataset.index = String(index);
     card.setAttribute("aria-label", label);
     card.innerHTML = '<div class="work-feature-media" aria-hidden="true"></div>';
+
+    const mediaShell = card.querySelector(".work-feature-media");
+    const previewSource = backgroundMediaSources[card.dataset.preview];
+
+    preloadBackgroundShell(mediaShell, previewSource);
+    bindTrackedClick(card, "project_click", () => ({
+      project: label,
+      preview: card.dataset.preview || "",
+      href: card.getAttribute("href") || "",
+    }));
 
     workFeatureStack.append(card);
     return card;

@@ -39,6 +39,10 @@ html {
   scrollbar-gutter: stable both-edges;
 }
 
+html.js {
+  scroll-behavior: auto;
+}
+
 body {
   margin: 0;
   min-height: 100vh;
@@ -662,6 +666,70 @@ h2 {
   object-fit: cover;
 }
 
+.progressive-media-shell {
+  position: relative;
+  overflow: hidden;
+}
+
+.progressive-media-shell::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0;
+  background:
+    linear-gradient(
+      110deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.06) 24%,
+      rgba(255, 255, 255, 0.16) 48%,
+      rgba(255, 255, 255, 0.06) 72%,
+      rgba(255, 255, 255, 0) 100%
+    ),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+  background-size: 220% 100%, 100% 100%;
+  background-position: 100% 0, 0 0;
+  transition: opacity 260ms ease;
+}
+
+.progressive-media-shell.is-media-loading::after {
+  opacity: 1;
+  animation: media-shimmer 1.4s linear infinite;
+}
+
+.progressive-media-shell.is-media-loaded::after {
+  opacity: 0;
+}
+
+.progressive-media,
+.progressive-video {
+  opacity: 0.001;
+  filter: blur(16px);
+  transform: scale(1.025);
+  transition:
+    opacity 320ms ease,
+    filter 520ms ease,
+    transform 520ms ease;
+}
+
+.progressive-media.is-media-loaded,
+.progressive-video.is-media-loaded {
+  opacity: 1;
+  filter: blur(0);
+  transform: scale(1);
+}
+
+@keyframes media-shimmer {
+  from {
+    background-position: 100% 0, 0 0;
+  }
+
+  to {
+    background-position: -120% 0, 0 0;
+  }
+}
+
 .service-detail-overlay,
 .services-video-overlay {
   position: absolute;
@@ -904,6 +972,10 @@ h2 {
     border-color 200ms ease,
     box-shadow 200ms ease,
     background 300ms ease;
+}
+
+.work-feature-media.is-media-loading {
+  background-size: cover;
 }
 
 .work-case-grid {
