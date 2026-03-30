@@ -497,22 +497,33 @@ const inquiryServiceLabel = document.querySelector("#inquiry-service-label");
 const contactEmailLink = document.querySelector("#contact-email-link");
 
 if (inquiryMessageField && inquiryServiceLabel && contactEmailLink) {
-  const serviceTemplates = {
-    "brand-identity": "Brand Identity & Visual Systems",
-    "campaign-design": "Campaign Design & Marketing Visuals",
-    illustration: "Illustration & Visual Development",
-    "game-art": "Game Art & Interactive Visual Design",
-    "motion-design": "Motion Design & Animated Content",
-    "three-d-visualization": "3D Design & Product Visualization",
-    "architectural-visualization": "Architectural & Spatial Visualization",
-    retouching: "Retouching & Image Refinement",
+  const localizedServiceTemplates = {
+    en: {
+      "brand-identity": "Brand Identity & Visual Systems",
+      "campaign-design": "Campaign Design & Marketing Visuals",
+      illustration: "Illustration & Visual Development",
+      "game-art": "Game Art & Interactive Visual Design",
+      "motion-design": "Motion Design & Animated Content",
+      "three-d-visualization": "3D Design & Product Visualization",
+      "architectural-visualization": "Architectural & Spatial Visualization",
+      retouching: "Retouching & Image Refinement",
+    },
+    hi: {
+      "brand-identity": "ब्रांड आइडेंटिटी और विज़ुअल सिस्टम्स",
+      "campaign-design": "कैंपेन डिज़ाइन और मार्केटिंग विज़ुअल्स",
+      illustration: "इलस्ट्रेशन और विज़ुअल डेवलपमेंट",
+      "game-art": "गेम आर्ट और इंटरैक्टिव विज़ुअल डिज़ाइन",
+      "motion-design": "मोशन डिज़ाइन और ऐनिमेटेड कंटेंट",
+      "three-d-visualization": "3D डिज़ाइन और प्रोडक्ट विज़ुअलाइज़ेशन",
+      "architectural-visualization": "आर्किटेक्चरल और स्पैशियल विज़ुअलाइज़ेशन",
+      retouching: "रिटचिंग और इमेज रिफाइनमेंट",
+    },
   };
 
-  const searchParams = new URLSearchParams(window.location.search);
-  const serviceSlug = searchParams.get("service");
-  const serviceName = serviceTemplates[serviceSlug];
-
-  const genericMessage = `Hello Sanidhya,
+  const contactCopy = {
+    en: {
+      generalInquiryLabel: "General inquiry",
+      genericMessage: `Hello Sanidhya,
 
 I would love to discuss a potential project.
 
@@ -522,10 +533,8 @@ Timeline:
 Budget range:
 References:
 
-Please let me know the next steps.`;
-
-  const defaultMessage = serviceName
-    ? `Hello Sanidhya,
+Please let me know the next steps.`,
+      projectMessage: (serviceName) => `Hello Sanidhya,
 
 I would love to discuss ${serviceName} for an upcoming project.
 
@@ -535,16 +544,56 @@ Timeline:
 Budget range:
 References:
 
-Please let me know the next steps.`
-    : genericMessage;
+Please let me know the next steps.`,
+      inquirySubject: "Project Inquiry",
+      serviceSubject: (serviceName) => `Inquiry - ${serviceName}`,
+    },
+    hi: {
+      generalInquiryLabel: "सामान्य पूछताछ",
+      genericMessage: `Hello Sanidhya,
 
-  inquiryServiceLabel.textContent = serviceName || "General inquiry";
+मैं एक संभावित प्रोजेक्ट पर बात करना चाहता/चाहती हूँ।
+
+Brand / project:
+Scope:
+Timeline:
+Budget range:
+References:
+
+कृपया अगले steps बताइए।`,
+      projectMessage: (serviceName) => `Hello Sanidhya,
+
+मैं ${serviceName} से जुड़े एक संभावित प्रोजेक्ट पर बात करना चाहता/चाहती हूँ।
+
+Brand / project:
+Scope:
+Timeline:
+Budget range:
+References:
+
+कृपया अगले steps बताइए।`,
+      inquirySubject: "Project Inquiry",
+      serviceSubject: (serviceName) => `Inquiry - ${serviceName}`,
+    },
+  };
+
+  const searchParams = new URLSearchParams(window.location.search);
+  const serviceSlug = searchParams.get("service");
+  const activeLocale = pageLocale === "hi" ? "hi" : "en";
+  const serviceTemplates = localizedServiceTemplates[activeLocale];
+  const serviceName = serviceTemplates[serviceSlug];
+  const copy = contactCopy[activeLocale];
+  const defaultMessage = serviceName
+    ? copy.projectMessage(serviceName)
+    : copy.genericMessage;
+
+  inquiryServiceLabel.textContent = serviceName || copy.generalInquiryLabel;
   inquiryMessageField.value = defaultMessage;
 
   const updateEmailLink = () => {
     const subject = serviceName
-      ? `Inquiry - ${serviceName}`
-      : "Project Inquiry";
+      ? copy.serviceSubject(serviceName)
+      : copy.inquirySubject;
     const body = inquiryMessageField.value.trim() || defaultMessage;
 
     contactEmailLink.href = `mailto:singhsanidhya13@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
