@@ -4,6 +4,203 @@ document.querySelectorAll(".brand-name").forEach((brandName) => {
   brandName.textContent = "Sanidhya Singh";
 });
 
+const localeStorageKey = "locale";
+const localeSuggestionDismissKey = "locale-suggestion-dismissed";
+const pageLocale = document.documentElement.dataset.pageLocale || "en";
+
+const getStoredLocale = () => {
+  try {
+    return window.localStorage.getItem(localeStorageKey);
+  } catch (error) {
+    return null;
+  }
+};
+
+const setStoredLocale = (locale) => {
+  try {
+    window.localStorage.setItem(localeStorageKey, locale);
+  } catch (error) {
+    return;
+  }
+};
+
+const getSuggestionDismissed = () => {
+  try {
+    return window.sessionStorage.getItem(localeSuggestionDismissKey) === "true";
+  } catch (error) {
+    return false;
+  }
+};
+
+const setSuggestionDismissed = () => {
+  try {
+    window.sessionStorage.setItem(localeSuggestionDismissKey, "true");
+  } catch (error) {
+    return;
+  }
+};
+
+const getTranslation = async (locale) => {
+  const normalizedLocale = locale === "hi" ? "hi" : "en";
+
+  try {
+    const response = await fetch(`/locales/${normalizedLocale}.json`, {
+      headers: {
+        Accept: "application/json",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Unable to load locale ${normalizedLocale}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    if (normalizedLocale !== "en") {
+      return getTranslation("en");
+    }
+
+    return null;
+  }
+};
+
+const applyTranslations = (translations) => {
+  if (!translations) {
+    return;
+  }
+
+  document.querySelectorAll("[data-i18n]").forEach((element) => {
+    const key = element.dataset.i18n;
+
+    if (!key || !(key in translations)) {
+      return;
+    }
+
+    element.textContent = translations[key];
+  });
+
+  document.querySelectorAll("[data-i18n-html]").forEach((element) => {
+    const key = element.dataset.i18nHtml;
+
+    if (!key || !(key in translations)) {
+      return;
+    }
+
+    element.innerHTML = translations[key];
+  });
+
+  const titleElement = document.querySelector("title[data-i18n-title]");
+  if (titleElement) {
+    const key = titleElement.dataset.i18nTitle;
+    if (key && key in translations) {
+      document.title = translations[key];
+    }
+  }
+
+  const metaDescription = document.querySelector(
+    'meta[name="description"][data-i18n-meta]'
+  );
+  if (metaDescription) {
+    const key = metaDescription.dataset.i18nMeta;
+    if (key && key in translations) {
+      metaDescription.setAttribute("content", translations[key]);
+    }
+  }
+};
+
+const initializePageTranslation = async () => {
+  if (pageLocale === "hi" && !getStoredLocale()) {
+    setStoredLocale("hi");
+  }
+
+  if (!document.querySelector("[data-i18n], [data-i18n-html], title[data-i18n-title]")) {
+    return;
+  }
+
+  const translations = await getTranslation(pageLocale);
+  applyTranslations(translations);
+};
+
+const removeLanguageSuggestion = () => {
+  document.querySelector(".language-suggestion")?.remove();
+};
+
+const renderLanguageSuggestion = () => {
+  if (document.querySelector(".language-suggestion")) {
+    return;
+  }
+
+  const suggestion = document.createElement("aside");
+  suggestion.className = "language-suggestion";
+  suggestion.setAttribute("role", "dialog");
+  suggestion.setAttribute("aria-live", "polite");
+  suggestion.setAttribute("aria-label", "Language suggestion");
+
+  suggestion.innerHTML = `
+    <button class="language-suggestion-close" type="button" aria-label="Dismiss language suggestion">×</button>
+    <p class="language-suggestion-title">Language</p>
+    <p class="language-suggestion-text">We noticed you're in India 🇮🇳 — would you like to view this site in Hindi?</p>
+    <div class="language-suggestion-actions">
+      <button class="language-suggestion-button is-primary" type="button" data-language-choice="hi">Switch to Hindi</button>
+      <button class="language-suggestion-button is-secondary" type="button" data-language-choice="en">Stay in English</button>
+    </div>
+  `;
+
+  suggestion
+    .querySelector('[data-language-choice="hi"]')
+    ?.addEventListener("click", () => {
+      setStoredLocale("hi");
+      removeLanguageSuggestion();
+      window.location.href = "/hi";
+    });
+
+  suggestion
+    .querySelector('[data-language-choice="en"]')
+    ?.addEventListener("click", () => {
+      setStoredLocale("en");
+      removeLanguageSuggestion();
+    });
+
+  suggestion
+    .querySelector(".language-suggestion-close")
+    ?.addEventListener("click", () => {
+      setSuggestionDismissed();
+      removeLanguageSuggestion();
+    });
+
+  document.body.append(suggestion);
+};
+
+const initializeLanguageSuggestion = async () => {
+  if (pageLocale === "hi" || getStoredLocale() || getSuggestionDismissed()) {
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/country", {
+      headers: {
+        Accept: "application/json",
+      },
+      cache: "no-store",
+    });
+
+    if (!response.ok) {
+      return;
+    }
+
+    const { country } = await response.json();
+
+    if (country === "IN") {
+      renderLanguageSuggestion();
+    }
+  } catch (error) {
+    return;
+  }
+};
+
+void initializePageTranslation();
+void initializeLanguageSuggestion();
+
 const siteHeader = document.querySelector(".site-header");
 const siteNav = document.querySelector(".site-nav");
 const headerContact = document.querySelector(".header-contact");

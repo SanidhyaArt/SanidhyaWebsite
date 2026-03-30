@@ -2623,6 +2623,91 @@ h2 {
   background: rgba(255, 255, 255, 0.8);
 }
 
+.language-suggestion {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 70;
+  width: min(360px, calc(100vw - 32px));
+  padding: 18px 18px 16px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background:
+    linear-gradient(180deg, rgba(18, 18, 18, 0.92), rgba(24, 20, 18, 0.88)),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.06), transparent);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(16px);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.language-suggestion-title {
+  margin: 0 0 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  font-size: 0.72rem;
+  color: rgba(255, 255, 255, 0.58);
+}
+
+.language-suggestion-text {
+  margin: 0;
+  padding-right: 26px;
+  font-size: 0.98rem;
+  line-height: 1.6;
+}
+
+.language-suggestion-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.language-suggestion-button {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  padding: 10px 14px;
+  font: inherit;
+  cursor: pointer;
+  transition:
+    transform 180ms ease,
+    border-color 180ms ease,
+    background-color 180ms ease;
+}
+
+.language-suggestion-button:hover,
+.language-suggestion-button:focus-visible,
+.language-suggestion-close:hover,
+.language-suggestion-close:focus-visible {
+  transform: translateY(-1px);
+}
+
+.language-suggestion-button.is-primary {
+  background: rgba(255, 255, 255, 0.92);
+  color: #111111;
+}
+
+.language-suggestion-button.is-secondary {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.language-suggestion-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 30px;
+  height: 30px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.82);
+  font: inherit;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
 @media (max-width: 980px) {
   .hero,
   .contact,
@@ -2708,6 +2793,12 @@ h2 {
     width: 100%;
     justify-content: center;
     margin-left: 0;
+  }
+
+  .language-suggestion {
+    right: 16px;
+    bottom: 16px;
+    width: min(100vw - 24px, 360px);
   }
 
   .related-grid {
