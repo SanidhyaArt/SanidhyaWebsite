@@ -59,9 +59,6 @@ const setSuggestionDismissed = () => {
   }
 };
 
-const activeLocale =
-  pageLocale === "hi" || getStoredLocale() === "hi" ? "hi" : "en";
-
 const normalizeLocalePath = (pathname = window.location.pathname) => {
   let normalizedPath = pathname || "/";
 
@@ -80,6 +77,13 @@ const normalizeLocalePath = (pathname = window.location.pathname) => {
 };
 
 const currentLocalePath = normalizeLocalePath();
+const storedLocale = getStoredLocale();
+const dedicatedHindiPaths = new Set(["/", "/about", "/contact", "/services", "/work"]);
+const activeLocale =
+  pageLocale === "hi" ||
+  (storedLocale === "hi" && !dedicatedHindiPaths.has(currentLocalePath))
+    ? "hi"
+    : "en";
 
 const escapeHtml = (value = "") =>
   String(value)
