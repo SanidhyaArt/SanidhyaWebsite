@@ -1142,10 +1142,9 @@ h2 {
   width: 2px;
   transform: translateX(-50%);
   background: rgba(255, 255, 255, 0.88);
-  box-shadow:
-    0 0 0 1px rgba(10, 10, 10, 0.24),
-    0 0 24px rgba(255, 255, 255, 0.22);
+  box-shadow: 0 0 0 1px rgba(10, 10, 10, 0.24);
   pointer-events: none;
+  transition: box-shadow 180ms ease;
 }
 
 .work-compare-divider::before,
@@ -1161,15 +1160,17 @@ h2 {
   left: -1px;
   width: 24px;
   background: linear-gradient(90deg, rgba(10, 10, 10, 0.26), rgba(10, 10, 10, 0));
-  opacity: 0.58;
+  opacity: 0;
+  transition: opacity 180ms ease;
 }
 
 .work-compare-divider::after {
   right: -1px;
   width: 28px;
   background: linear-gradient(90deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0));
-  opacity: 0.62;
+  opacity: 0;
   mix-blend-mode: screen;
+  transition: opacity 180ms ease;
 }
 
 .work-compare-handle {
@@ -1288,29 +1289,9 @@ h2 {
   }
 }
 
-@keyframes compare-divider-pulse {
-  0%,
-  100% {
-    box-shadow:
-      0 0 0 1px rgba(10, 10, 10, 0.24),
-      0 0 22px rgba(255, 255, 255, 0.18);
-  }
-
-  50% {
-    box-shadow:
-      0 0 0 1px rgba(10, 10, 10, 0.26),
-      0 0 30px rgba(255, 255, 255, 0.28),
-      0 0 14px rgba(255, 214, 153, 0.14);
-  }
-}
-
 @media (prefers-reduced-motion: no-preference) {
   .work-compare:not(.has-user-interacted):not(.is-interacting) .work-compare-handle {
     animation: compare-handle-nudge 2.8s ease-in-out infinite;
-  }
-
-  .work-compare:not(.has-user-interacted):not(.is-interacting) .work-compare-divider {
-    animation: compare-divider-pulse 2.8s ease-in-out infinite;
   }
 }
 
