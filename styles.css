@@ -1321,10 +1321,10 @@ h2 {
     radial-gradient(circle at 76% 22%, rgba(240, 240, 240, 0.12), transparent 28%),
     radial-gradient(circle at 72% 76%, rgba(255, 155, 155, 0.18), transparent 30%),
     linear-gradient(135deg, rgba(17, 17, 17, 0.72) 0%, rgba(23, 23, 23, 0.58) 42%, rgba(30, 26, 24, 0.74) 100%),
-    url("./assets/images/Wedding-Retouch.webp");
-  background-size: auto, auto, auto, auto, auto, 208% auto;
+    url("./assets/images/retouching-wedding-after.webp");
+  background-size: auto, auto, auto, auto, auto, cover;
   background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
-  background-position: center, 18% 24%, 76% 22%, 72% 76%, center, 73% 24%;
+  background-position: center, 18% 24%, 76% 22%, 72% 76%, center, center;
 }
 
 .services-heading {
