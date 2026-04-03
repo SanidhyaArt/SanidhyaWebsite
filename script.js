@@ -2573,25 +2573,10 @@ const initializeScrollTextReveal = () => {
     return;
   }
 
-  const pendingVisibleText = new Set();
-  let revealEnabled = window.scrollY > 12;
-  let lastScrollY = window.scrollY;
-
-  textElements.forEach((element, index) => {
-    element.classList.add("scroll-text-reveal");
-    element.style.setProperty("--scroll-text-delay", `${Math.min(index % 8, 7) * 24}ms`);
-  });
-
   const revealObserver = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
         if (!entry.isIntersecting) {
-          pendingVisibleText.delete(entry.target);
-          return;
-        }
-
-        if (!revealEnabled) {
-          pendingVisibleText.add(entry.target);
           return;
         }
 
@@ -2605,60 +2590,23 @@ const initializeScrollTextReveal = () => {
     }
   );
 
-  textElements.forEach((element) => {
-    revealObserver.observe(element);
-  });
+  textElements.forEach((element, index) => {
+    const rect = element.getBoundingClientRect();
+    const isInitiallyVisible =
+      rect.top < window.innerHeight &&
+      rect.bottom > 0 &&
+      rect.left < window.innerWidth &&
+      rect.right > 0;
 
-  const flushVisibleText = () => {
-    if (!revealEnabled) {
+    if (isInitiallyVisible) {
+      element.classList.add("is-scroll-text-visible");
       return;
     }
 
-    pendingVisibleText.forEach((element) => {
-      element.classList.add("is-scroll-text-visible");
-      revealObserver.unobserve(element);
-    });
-    pendingVisibleText.clear();
-  };
-
-  const unlockRevealOnDownwardScroll = () => {
-    const currentScrollY = window.scrollY;
-
-    if (!revealEnabled && currentScrollY > lastScrollY + 2) {
-      revealEnabled = true;
-      document.documentElement.classList.add("scroll-text-reveal-started");
-      flushVisibleText();
-    }
-
-    lastScrollY = currentScrollY;
-  };
-
-  window.addEventListener("scroll", unlockRevealOnDownwardScroll, {
-    passive: true,
+    element.classList.add("scroll-text-reveal");
+    element.style.setProperty("--scroll-text-delay", `${Math.min(index % 8, 7) * 24}ms`);
+    revealObserver.observe(element);
   });
-  window.addEventListener(
-    "wheel",
-    (event) => {
-      if (!revealEnabled && event.deltaY > 0) {
-        revealEnabled = true;
-        document.documentElement.classList.add("scroll-text-reveal-started");
-        flushVisibleText();
-      }
-    },
-    { passive: true }
-  );
-  window.addEventListener(
-    "touchmove",
-    () => {
-      unlockRevealOnDownwardScroll();
-    },
-    { passive: true }
-  );
-
-  if (revealEnabled) {
-    document.documentElement.classList.add("scroll-text-reveal-started");
-    flushVisibleText();
-  }
 };
 
 initializeScrollTextReveal();
