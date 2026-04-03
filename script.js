@@ -437,21 +437,15 @@ const getCompareAssetsForCase = (card) => {
 };
 
 const currentLocalePath = normalizeLocalePath();
-const dedicatedHindiPaths = new Set(["/", "/about", "/contact", "/services", "/work"]);
 const pageIsExplicitHindi = pageLocale === "hi" || window.location.pathname.startsWith("/hi");
 
 if (pageIsExplicitHindi) {
   setNavigationLocale("hi");
-} else if (dedicatedHindiPaths.has(currentLocalePath)) {
+} else {
   setNavigationLocale("en");
 }
 
-const navigationLocale = getNavigationLocale();
-const activeLocale =
-  pageIsExplicitHindi ||
-  (navigationLocale === "hi" && !dedicatedHindiPaths.has(currentLocalePath))
-    ? "hi"
-    : "en";
+const activeLocale = pageIsExplicitHindi ? "hi" : "en";
 
 const escapeHtml = (value = "") =>
   String(value)
