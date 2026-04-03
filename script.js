@@ -7,7 +7,7 @@ document.querySelectorAll(".brand-name").forEach((brandName) => {
 const localeStorageKey = "locale";
 const localeSuggestionDismissKey = "locale-suggestion-dismissed";
 const localeNavigationContextKey = "locale-navigation-context";
-const pageLocale = document.documentElement.dataset.pageLocale || "en";
+const pageLocale = "en";
 const prefersReducedMotion =
   window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
 const analyticsEndpoint = "/api/track";
@@ -437,15 +437,11 @@ const getCompareAssetsForCase = (card) => {
 };
 
 const currentLocalePath = normalizeLocalePath();
-const pageIsExplicitHindi = pageLocale === "hi" || window.location.pathname.startsWith("/hi");
+const pageIsExplicitHindi = false;
 
-if (pageIsExplicitHindi) {
-  setNavigationLocale("hi");
-} else {
-  setNavigationLocale("en");
-}
+setNavigationLocale("en");
 
-const activeLocale = pageIsExplicitHindi ? "hi" : "en";
+const activeLocale = "en";
 
 const stripHindiPrefixFromPath = (pathname = "/") => {
   if (!pathname.startsWith("/hi")) {
@@ -2084,19 +2080,11 @@ const applyTranslations = (translations) => {
 };
 
 const initializePageTranslation = async () => {
-  if (pageLocale === "hi" && !getStoredLocale()) {
-    setStoredLocale("hi");
-  }
-
-  if (pageLocale === "hi") {
-    setNavigationLocale("hi");
-  }
-
   if (!document.querySelector("[data-i18n], [data-i18n-html], title[data-i18n-title]")) {
     return;
   }
 
-  const translations = await getTranslation(activeLocale);
+  const translations = await getTranslation("en");
   applyTranslations(translations);
 };
 
@@ -2153,30 +2141,7 @@ const renderLanguageSuggestion = () => {
 };
 
 const initializeLanguageSuggestion = async () => {
-  if (activeLocale === "hi" || getStoredLocale() || getSuggestionDismissed()) {
-    return;
-  }
-
-  try {
-    const response = await fetch("/api/country", {
-      headers: {
-        Accept: "application/json",
-      },
-      cache: "no-store",
-    });
-
-    if (!response.ok) {
-      return;
-    }
-
-    const { country } = await response.json();
-
-    if (country === "IN") {
-      renderLanguageSuggestion();
-    }
-  } catch (error) {
-    return;
-  }
+  removeLanguageSuggestion();
 };
 
 applyHindiPageOverrides();
