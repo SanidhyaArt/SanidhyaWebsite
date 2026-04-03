@@ -145,6 +145,13 @@ const predictiveRouteMeta = {
     assets: ["/assets/videos/site-background.mp4"],
     basePriority: 0.58,
   },
+  "/courses": {
+    id: "page:courses",
+    category: "Courses",
+    tags: ["courses", "learning", "education", "store"],
+    assets: ["/assets/videos/site-background.mp4"],
+    basePriority: 0.64,
+  },
   "/brand-identity": {
     id: "service:brand-identity",
     ...predictivePreviewMeta["brand-identity"],
