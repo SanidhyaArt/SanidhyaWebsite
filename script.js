@@ -24,7 +24,7 @@ const backgroundMediaSources = {
 const backgroundMediaVariants = {
   "brand-identity": {
     thumbnail: "/assets/images/youtube-thumbnail.webp",
-    rollout: "/assets/images/brand-identity-rollout-01.webp",
+    rollout: "/assets/images/Sneaker.webp",
   },
 };
 const predictivePreloadModuleSources = [
@@ -43,7 +43,7 @@ const predictivePreviewMeta = {
     assets: [
       "/assets/images/youtube-thumbnail.webp",
       "/assets/videos/movie-title-card.mp4",
-      "/assets/images/brand-identity-rollout-01.webp",
+      "/assets/images/Sneaker.webp",
     ],
     basePriority: 0.76,
   },
