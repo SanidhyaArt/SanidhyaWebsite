@@ -2534,6 +2534,135 @@ document.querySelectorAll("img").forEach((image) => {
   }
 });
 
+const initializeScrollTextReveal = () => {
+  const revealSelectors = [
+    "main .eyebrow",
+    "main h1",
+    "main h2",
+    "main h3",
+    "main p",
+    "main li",
+    "main summary",
+    "main .service-name",
+    "main .service-index",
+    "main .metric-value",
+    "main .metric-label",
+    "main .button",
+    "main .work-title-display",
+    "main .work-compare-label",
+    "main .contact-value",
+    "main .freebies-field-label",
+    "main .freebies-status",
+  ].join(", ");
+
+  const textElements = Array.from(document.querySelectorAll(revealSelectors)).filter(
+    (element) =>
+      !element.closest(".work-title-source") &&
+      !element.closest("[aria-hidden='true']") &&
+      !element.classList.contains("work-compare-range")
+  );
+
+  if (!textElements.length) {
+    return;
+  }
+
+  if (prefersReducedMotion || !("IntersectionObserver" in window)) {
+    textElements.forEach((element) => {
+      element.classList.add("is-scroll-text-visible");
+    });
+    return;
+  }
+
+  const pendingVisibleText = new Set();
+  let revealEnabled = window.scrollY > 12;
+  let lastScrollY = window.scrollY;
+
+  textElements.forEach((element, index) => {
+    element.classList.add("scroll-text-reveal");
+    element.style.setProperty("--scroll-text-delay", `${Math.min(index % 8, 7) * 24}ms`);
+  });
+
+  const revealObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) {
+          pendingVisibleText.delete(entry.target);
+          return;
+        }
+
+        if (!revealEnabled) {
+          pendingVisibleText.add(entry.target);
+          return;
+        }
+
+        entry.target.classList.add("is-scroll-text-visible");
+        revealObserver.unobserve(entry.target);
+      });
+    },
+    {
+      rootMargin: "0px 0px -8% 0px",
+      threshold: 0.08,
+    }
+  );
+
+  textElements.forEach((element) => {
+    revealObserver.observe(element);
+  });
+
+  const flushVisibleText = () => {
+    if (!revealEnabled) {
+      return;
+    }
+
+    pendingVisibleText.forEach((element) => {
+      element.classList.add("is-scroll-text-visible");
+      revealObserver.unobserve(element);
+    });
+    pendingVisibleText.clear();
+  };
+
+  const unlockRevealOnDownwardScroll = () => {
+    const currentScrollY = window.scrollY;
+
+    if (!revealEnabled && currentScrollY > lastScrollY + 2) {
+      revealEnabled = true;
+      document.documentElement.classList.add("scroll-text-reveal-started");
+      flushVisibleText();
+    }
+
+    lastScrollY = currentScrollY;
+  };
+
+  window.addEventListener("scroll", unlockRevealOnDownwardScroll, {
+    passive: true,
+  });
+  window.addEventListener(
+    "wheel",
+    (event) => {
+      if (!revealEnabled && event.deltaY > 0) {
+        revealEnabled = true;
+        document.documentElement.classList.add("scroll-text-reveal-started");
+        flushVisibleText();
+      }
+    },
+    { passive: true }
+  );
+  window.addEventListener(
+    "touchmove",
+    () => {
+      unlockRevealOnDownwardScroll();
+    },
+    { passive: true }
+  );
+
+  if (revealEnabled) {
+    document.documentElement.classList.add("scroll-text-reveal-started");
+    flushVisibleText();
+  }
+};
+
+initializeScrollTextReveal();
+
 const revealCards = new IntersectionObserver(
   (entries) => {
     for (const entry of entries) {

@@ -720,6 +720,29 @@ h2 {
   transform: scale(1);
 }
 
+.js .scroll-text-reveal {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+  transition:
+    opacity 700ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--scroll-text-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.js .scroll-text-reveal.is-scroll-text-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js .scroll-text-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
 @keyframes media-shimmer {
   from {
     background-position: 100% 0, 0 0;
