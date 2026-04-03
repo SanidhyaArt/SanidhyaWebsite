@@ -3174,6 +3174,17 @@ if (hiddenPage && window.sessionStorage.getItem(freebiesAccessKey) === "true") {
   hydrateFreebieLinks();
 }
 
+const memberLoginForm = document.querySelector("#member-login-form");
+const memberLoginStatus = document.querySelector("#member-login-status");
+
+if (memberLoginForm && memberLoginStatus) {
+  memberLoginForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    memberLoginStatus.textContent =
+      "Member login will activate once course accounts are live.";
+  });
+}
+
 const workTitleRail = document.querySelector("#work-title-rail");
 const workTitleItems = Array.from(document.querySelectorAll(".work-title-item"));
 const workTitleDisplay = document.querySelector("#work-title-display");

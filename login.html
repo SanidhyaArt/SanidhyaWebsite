@@ -64,14 +64,52 @@
           <h1>LOG IN</h1>
         </section>
 
-        <section class="page-grid">
-          <article class="detail-card">
+        <section class="login-stage" aria-label="Member login">
+          <article class="login-card">
             <p class="service-index">Member Access</p>
-            <h3>Course login is coming soon</h3>
-            <p>Once courses go live, this page will become the entry point for student accounts, purchases, and private course libraries.</p>
-            <div class="section-actions">
-              <a class="button button-secondary" href="./courses">Back to Courses</a>
-            </div>
+            <h3>Log in to your account</h3>
+            <p>Access purchased courses, private lessons, and your future member library.</p>
+
+            <form class="login-form" id="member-login-form" action="#" method="post">
+              <label class="login-field">
+                <span>Email Address</span>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="you@example.com"
+                  autocomplete="email"
+                  required
+                >
+              </label>
+
+              <label class="login-field">
+                <span>Password</span>
+                <input
+                  type="password"
+                  name="password"
+                  placeholder="Enter your password"
+                  autocomplete="current-password"
+                  minlength="8"
+                  required
+                >
+              </label>
+
+              <div class="login-meta-row">
+                <label class="login-remember">
+                  <input type="checkbox" name="remember">
+                  <span>Remember me</span>
+                </label>
+                <a href="mailto:singhsanidhya13@gmail.com?subject=Password%20Reset%20Request">Forgot password?</a>
+              </div>
+
+              <button class="button button-primary login-submit-button" type="submit">Log In</button>
+              <p class="login-status" id="member-login-status" aria-live="polite"></p>
+            </form>
+
+            <p class="login-helper">
+              New here?
+              <a href="./courses">Browse courses</a>
+            </p>
           </article>
         </section>
       </div>

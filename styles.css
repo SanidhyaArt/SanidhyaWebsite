@@ -2543,6 +2543,131 @@ h2 {
   min-width: 120px;
 }
 
+.login-stage {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding-inline: 24px;
+}
+
+.login-card {
+  width: min(100%, 640px);
+  padding: 48px;
+  border-radius: 32px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04)),
+    rgba(8, 8, 10, 0.58);
+  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.38);
+  backdrop-filter: blur(18px);
+}
+
+.login-card h3 {
+  margin-top: 18px;
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.login-card p {
+  margin-top: 20px;
+  color: rgba(255, 247, 238, 0.8);
+  line-height: 1.7;
+}
+
+.login-form {
+  display: grid;
+  gap: 24px;
+  margin-top: 40px;
+}
+
+.login-field {
+  display: grid;
+  gap: 14px;
+}
+
+.login-field span,
+.login-remember span {
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: rgba(255, 247, 238, 0.76);
+}
+
+.login-field input {
+  width: 100%;
+  padding: 20px 24px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 24px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #ffffff;
+  font: inherit;
+  font-size: 1rem;
+  outline: none;
+  transition:
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.login-field input::placeholder {
+  color: rgba(255, 247, 238, 0.38);
+}
+
+.login-field input:focus {
+  border-color: rgba(255, 228, 181, 0.45);
+  background: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 0 4px rgba(255, 228, 181, 0.08);
+}
+
+.login-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.login-remember {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.login-remember input {
+  width: 18px;
+  height: 18px;
+  accent-color: #ffe0b2;
+}
+
+.login-meta-row a,
+.login-helper a {
+  color: #ffe0b2;
+  text-decoration: none;
+  transition: color 180ms ease;
+}
+
+.login-meta-row a:hover,
+.login-helper a:hover {
+  color: #fff7ee;
+}
+
+.login-submit-button {
+  width: 100%;
+  justify-content: center;
+}
+
+.login-status {
+  min-height: 1.7em;
+  margin-top: 0;
+  font-size: 0.9rem;
+  color: rgba(255, 224, 178, 0.94);
+  text-align: center;
+}
+
+.login-helper {
+  margin-top: 28px;
+  text-align: center;
+}
+
 .freebies-status {
   margin: 10px 0 0;
   color: rgba(255, 255, 255, 0.68);
@@ -3247,6 +3372,20 @@ h2 {
   .freebies-unlock-button {
     min-width: 108px;
     padding-inline: 16px;
+  }
+
+  .login-stage {
+    padding-inline: 0;
+  }
+
+  .login-card {
+    padding: 36px 24px;
+    border-radius: 24px;
+  }
+
+  .login-meta-row {
+    flex-direction: column;
+    align-items: flex-start;
   }
 
   .about-page-content > .services-heading {
