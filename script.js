@@ -6,6 +6,7 @@ document.querySelectorAll(".brand-name").forEach((brandName) => {
 
 const localeStorageKey = "locale";
 const localeSuggestionDismissKey = "locale-suggestion-dismissed";
+const localeNavigationContextKey = "locale-navigation-context";
 const pageLocale = document.documentElement.dataset.pageLocale || "en";
 const prefersReducedMotion =
   window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
@@ -346,6 +347,22 @@ const setSuggestionDismissed = () => {
   }
 };
 
+const getNavigationLocale = () => {
+  try {
+    return window.sessionStorage.getItem(localeNavigationContextKey);
+  } catch (error) {
+    return null;
+  }
+};
+
+const setNavigationLocale = (locale) => {
+  try {
+    window.sessionStorage.setItem(localeNavigationContextKey, locale);
+  } catch (error) {
+    return;
+  }
+};
+
 const normalizeLocalePath = (pathname = window.location.pathname) => {
   let normalizedPath = pathname || "/";
 
@@ -420,11 +437,19 @@ const getCompareAssetsForCase = (card) => {
 };
 
 const currentLocalePath = normalizeLocalePath();
-const storedLocale = getStoredLocale();
 const dedicatedHindiPaths = new Set(["/", "/about", "/contact", "/services", "/work"]);
+const pageIsExplicitHindi = pageLocale === "hi" || window.location.pathname.startsWith("/hi");
+
+if (pageIsExplicitHindi) {
+  setNavigationLocale("hi");
+} else if (dedicatedHindiPaths.has(currentLocalePath)) {
+  setNavigationLocale("en");
+}
+
+const navigationLocale = getNavigationLocale();
 const activeLocale =
-  pageLocale === "hi" ||
-  (storedLocale === "hi" && !dedicatedHindiPaths.has(currentLocalePath))
+  pageIsExplicitHindi ||
+  (navigationLocale === "hi" && !dedicatedHindiPaths.has(currentLocalePath))
     ? "hi"
     : "en";
 
@@ -2009,6 +2034,10 @@ const initializePageTranslation = async () => {
     setStoredLocale("hi");
   }
 
+  if (pageLocale === "hi") {
+    setNavigationLocale("hi");
+  }
+
   if (!document.querySelector("[data-i18n], [data-i18n-html], title[data-i18n-title]")) {
     return;
   }
@@ -2046,6 +2075,7 @@ const renderLanguageSuggestion = () => {
     .querySelector('[data-language-choice="hi"]')
     ?.addEventListener("click", () => {
       setStoredLocale("hi");
+      setNavigationLocale("hi");
       removeLanguageSuggestion();
       window.location.href = "/hi";
     });
@@ -2054,6 +2084,7 @@ const renderLanguageSuggestion = () => {
     .querySelector('[data-language-choice="en"]')
     ?.addEventListener("click", () => {
       setStoredLocale("en");
+      setNavigationLocale("en");
       removeLanguageSuggestion();
     });
 
