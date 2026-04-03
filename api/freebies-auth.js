@@ -2,8 +2,11 @@ const {
   assertAllowedUserAgent,
   assertRateLimit,
   assertSameSiteRequest,
+  clearAccessCookie,
+  getConfiguredPassword,
   readRequestBody,
   sendJson,
+  setAccessCookie,
 } = require("./_freebies-security");
 
 module.exports = async (req, res) => {
@@ -16,7 +19,7 @@ module.exports = async (req, res) => {
   if (
     !assertAllowedUserAgent(req, res) ||
     !assertSameSiteRequest(req, res) ||
-    !assertRateLimit(req, res, { scope: "track", limit: 120 })
+    !assertRateLimit(req, res, { scope: "freebies-auth", limit: 12 })
   ) {
     return;
   }
@@ -26,19 +29,24 @@ module.exports = async (req, res) => {
   try {
     payload = await readRequestBody(req);
   } catch (error) {
+    clearAccessCookie(res);
     sendJson(res, 400, { error: "Invalid request" });
     return;
   }
 
-  console.info(
-    JSON.stringify({
-      type: "site_event",
-      receivedAt: new Date().toISOString(),
-      country: String(req.headers["x-vercel-ip-country"] || "").toUpperCase(),
-      userAgent: req.headers["user-agent"] || "",
-      ...payload,
-    })
-  );
+  const submittedPassword = String(payload.password || "")
+    .trim()
+    .toLowerCase();
 
-  sendJson(res, 204);
+  if (!submittedPassword || submittedPassword !== getConfiguredPassword()) {
+    clearAccessCookie(res);
+    sendJson(res, 403, { error: "Invalid password" });
+    return;
+  }
+
+  setAccessCookie(res);
+  sendJson(res, 200, {
+    ok: true,
+    redirect: "/hidden",
+  });
 };
