@@ -447,6 +447,66 @@ if (pageIsExplicitHindi) {
 
 const activeLocale = pageIsExplicitHindi ? "hi" : "en";
 
+const stripHindiPrefixFromPath = (pathname = "/") => {
+  if (!pathname.startsWith("/hi")) {
+    return pathname || "/";
+  }
+
+  const strippedPath = pathname.slice(3);
+  return strippedPath || "/";
+};
+
+const enforceEnglishRoutesOutsideHi = () => {
+  if (pageIsExplicitHindi) {
+    return;
+  }
+
+  document.querySelectorAll('a[href^="/hi"]').forEach((link) => {
+    const href = link.getAttribute("href") || "";
+
+    if (!href.startsWith("/hi")) {
+      return;
+    }
+
+    try {
+      const url = new URL(href, window.location.origin);
+      url.pathname = stripHindiPrefixFromPath(url.pathname);
+      link.setAttribute(
+        "href",
+        `${url.pathname}${url.search}${url.hash}` || "/"
+      );
+    } catch (error) {
+      const fallbackPath = stripHindiPrefixFromPath(href);
+      link.setAttribute("href", fallbackPath || "/");
+    }
+  });
+
+  document.addEventListener(
+    "click",
+    (event) => {
+      const link = event.target.closest?.('a[href^="/hi"]');
+
+      if (!link) {
+        return;
+      }
+
+      event.preventDefault();
+
+      try {
+        const url = new URL(link.getAttribute("href") || "/", window.location.origin);
+        url.pathname = stripHindiPrefixFromPath(url.pathname);
+        window.location.href = `${url.pathname}${url.search}${url.hash}` || "/";
+      } catch (error) {
+        window.location.href =
+          stripHindiPrefixFromPath(link.getAttribute("href") || "/") || "/";
+      }
+    },
+    true
+  );
+};
+
+enforceEnglishRoutesOutsideHi();
+
 const escapeHtml = (value = "") =>
   String(value)
     .replace(/&/g, "&amp;")
