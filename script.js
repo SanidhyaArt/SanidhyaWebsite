@@ -1723,7 +1723,7 @@ const buildHindiFreebiesMarkup = () => `
       <p class="service-index">एक्सेस</p>
       <h3>फ्री डाउनलोडेबल रिसोर्सेज़</h3>
       <p>आगे बढ़ने और hidden downloads page पर जाने के लिए password दर्ज करें।</p>
-      <form class="freebies-unlock" id="freebies-unlock" data-password="sanidhya26">
+      <form class="freebies-unlock" id="freebies-unlock">
         <label class="sr-only" for="freebies-password">Password</label>
         <input class="freebies-password-input" id="freebies-password" name="password" type="password" placeholder="Password दर्ज करें" autocomplete="current-password">
         <button class="button button-primary freebies-unlock-button" type="submit">Got it</button>
@@ -1744,10 +1744,10 @@ const buildHindiHiddenMarkup = () => `
   </section>
   <section class="freebies-downloads">
     <div class="page-grid freebies-download-grid">
-      <article class="detail-card freebies-download-card"><a class="button button-secondary" href="./downloads/creative-brief-template.md" download>डाउनलोड</a></article>
-      <article class="detail-card freebies-download-card"><a class="button button-secondary" href="./downloads/brand-audit-checklist.md" download>डाउनलोड</a></article>
-      <article class="detail-card freebies-download-card"><a class="button button-secondary" href="./downloads/presentation-framework.md" download>डाउनलोड</a></article>
-      <article class="detail-card freebies-download-card"><a class="button button-secondary" href="./downloads/launch-asset-checklist.md" download>डाउनलोड</a></article>
+      <article class="detail-card freebies-download-card"><a class="button button-secondary" href="#" data-freebie-download data-freebie-file="creative-brief-template">डाउनलोड</a></article>
+      <article class="detail-card freebies-download-card"><a class="button button-secondary" href="#" data-freebie-download data-freebie-file="brand-audit-checklist">डाउनलोड</a></article>
+      <article class="detail-card freebies-download-card"><a class="button button-secondary" href="#" data-freebie-download data-freebie-file="presentation-framework">डाउनलोड</a></article>
+      <article class="detail-card freebies-download-card"><a class="button button-secondary" href="#" data-freebie-download data-freebie-file="launch-asset-checklist">डाउनलोड</a></article>
     </div>
   </section>
 `;
@@ -3037,27 +3037,27 @@ const freebiesAccessKey = "sanidhya-freebies-unlocked";
 const hiddenPage = document.querySelector(".hidden-page-body");
 
 if (freebiesForm && freebiesPasswordInput && freebiesStatus) {
-  const unlockPassword = (freebiesForm.dataset.password || "").trim().toLowerCase();
   const freebiesCopy =
     activeLocale === "hi"
       ? {
           invalidPassword: "यह password सही नहीं है।",
           accessGranted: "एक्सेस मिल गया। Redirect हो रहा है...",
+          requestFailed: "Request पूरा नहीं हो पाया। कृपया दोबारा कोशिश करें।",
         }
       : {
           invalidPassword: "That password does not match.",
           accessGranted: "Access granted. Redirecting...",
+          requestFailed: "That request could not be completed. Please try again.",
         };
 
-  freebiesForm.addEventListener("submit", (event) => {
+  freebiesForm.addEventListener("submit", async (event) => {
     event.preventDefault();
 
-    const submittedPassword = freebiesPasswordInput.value.trim().toLowerCase();
-    const unlocked = unlockPassword && submittedPassword === unlockPassword;
+    const submittedPassword = freebiesPasswordInput.value.trim();
 
     freebiesStatus.classList.remove("is-success", "is-error");
 
-    if (!unlocked) {
+    if (!submittedPassword) {
       freebiesStatus.textContent = freebiesCopy.invalidPassword;
       freebiesStatus.classList.add("is-error");
       freebiesPasswordInput.focus();
@@ -3065,16 +3065,92 @@ if (freebiesForm && freebiesPasswordInput && freebiesStatus) {
       return;
     }
 
-    window.sessionStorage.setItem(freebiesAccessKey, "true");
-    freebiesStatus.textContent = freebiesCopy.accessGranted;
-    freebiesStatus.classList.add("is-success");
-    freebiesPasswordInput.value = "";
-    window.location.href = activeLocale === "hi" ? "/hidden" : "./hidden";
+    try {
+      const authResponse = await fetch("/api/freebies-auth", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ password: submittedPassword }),
+      });
+
+      if (!authResponse.ok) {
+        if (authResponse.status === 403) {
+          freebiesStatus.textContent = freebiesCopy.invalidPassword;
+        } else {
+          freebiesStatus.textContent = freebiesCopy.requestFailed;
+        }
+
+        freebiesStatus.classList.add("is-error");
+        freebiesPasswordInput.focus();
+        freebiesPasswordInput.select();
+        return;
+      }
+
+      const authPayload = await authResponse.json();
+
+      window.sessionStorage.setItem(freebiesAccessKey, "true");
+      freebiesStatus.textContent = freebiesCopy.accessGranted;
+      freebiesStatus.classList.add("is-success");
+      freebiesPasswordInput.value = "";
+      window.location.href = authPayload.redirect || "./hidden";
+    } catch (error) {
+      freebiesStatus.textContent = freebiesCopy.requestFailed;
+      freebiesStatus.classList.add("is-error");
+      freebiesPasswordInput.focus();
+      freebiesPasswordInput.select();
+    }
   });
 }
 
 if (hiddenPage && window.sessionStorage.getItem(freebiesAccessKey) !== "true") {
   window.location.replace(activeLocale === "hi" ? "/freebies" : "./freebies");
+}
+
+if (hiddenPage && window.sessionStorage.getItem(freebiesAccessKey) === "true") {
+  const hydrateFreebieLinks = async () => {
+    const freebieDownloadLinks = document.querySelectorAll("[data-freebie-download]");
+
+    if (!freebieDownloadLinks.length) {
+      return;
+    }
+
+    try {
+      const linkResponse = await fetch("/api/freebies-links", {
+        method: "GET",
+        credentials: "same-origin",
+      });
+
+      if (!linkResponse.ok) {
+        throw new Error("Could not load signed links");
+      }
+
+      const linkPayload = await linkResponse.json();
+      const signedLinkMap = new Map(
+        (Array.isArray(linkPayload.files) ? linkPayload.files : []).map((fileEntry) => [
+          fileEntry.id,
+          fileEntry.href,
+        ])
+      );
+
+      freebieDownloadLinks.forEach((link) => {
+        const signedHref = signedLinkMap.get(link.dataset.freebieFile || "");
+
+        if (signedHref) {
+          link.href = signedHref;
+          link.setAttribute("download", "");
+          return;
+        }
+
+        link.setAttribute("aria-disabled", "true");
+      });
+    } catch (error) {
+      window.sessionStorage.removeItem(freebiesAccessKey);
+      window.location.replace("./freebies");
+    }
+  };
+
+  hydrateFreebieLinks();
 }
 
 const workTitleRail = document.querySelector("#work-title-rail");
