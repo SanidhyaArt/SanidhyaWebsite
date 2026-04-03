@@ -159,6 +159,13 @@ const predictiveRouteMeta = {
     assets: ["/assets/videos/site-background.mp4"],
     basePriority: 0.66,
   },
+  "/forgot-password": {
+    id: "page:forgot-password",
+    category: "Account",
+    tags: ["password", "reset", "account", "login"],
+    assets: ["/assets/videos/site-background.mp4"],
+    basePriority: 0.52,
+  },
   "/brand-identity": {
     id: "service:brand-identity",
     ...predictivePreviewMeta["brand-identity"],
@@ -3176,12 +3183,22 @@ if (hiddenPage && window.sessionStorage.getItem(freebiesAccessKey) === "true") {
 
 const memberLoginForm = document.querySelector("#member-login-form");
 const memberLoginStatus = document.querySelector("#member-login-status");
+const passwordResetForm = document.querySelector("#member-password-reset-form");
+const passwordResetStatus = document.querySelector("#member-password-reset-status");
 
 if (memberLoginForm && memberLoginStatus) {
   memberLoginForm.addEventListener("submit", (event) => {
     event.preventDefault();
     memberLoginStatus.textContent =
       "Member login will activate once course accounts are live.";
+  });
+}
+
+if (passwordResetForm && passwordResetStatus) {
+  passwordResetForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    passwordResetStatus.textContent =
+      "Password reset emails will activate once course accounts are live.";
   });
 }
 
