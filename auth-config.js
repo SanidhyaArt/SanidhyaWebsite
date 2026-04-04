@@ -1,4 +1,4 @@
 window.SANIDHYA_SUPABASE_CONFIG = {
-  url: "PASTE_YOUR_SUPABASE_PROJECT_URL",
-  anonKey: "PASTE_YOUR_SUPABASE_ANON_KEY",
+  url: "https://cuuutlobfwetrtnrcela.supabase.co",
+  anonKey: "sb_publishable_IhLdTf5ckrSHsafKWBB1rw_5-z4myWu",
 };
