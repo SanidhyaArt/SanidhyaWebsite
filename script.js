@@ -166,6 +166,13 @@ const predictiveRouteMeta = {
     assets: ["/assets/videos/site-background.mp4"],
     basePriority: 0.52,
   },
+  "/update-password": {
+    id: "page:update-password",
+    category: "Account",
+    tags: ["password", "reset", "account", "login"],
+    assets: ["/assets/videos/site-background.mp4"],
+    basePriority: 0.52,
+  },
   "/brand-identity": {
     id: "service:brand-identity",
     ...predictivePreviewMeta["brand-identity"],
@@ -3183,23 +3190,316 @@ if (hiddenPage && window.sessionStorage.getItem(freebiesAccessKey) === "true") {
 
 const memberLoginForm = document.querySelector("#member-login-form");
 const memberLoginStatus = document.querySelector("#member-login-status");
+const memberLoginSubmit = document.querySelector("#member-login-submit");
 const passwordResetForm = document.querySelector("#member-password-reset-form");
 const passwordResetStatus = document.querySelector("#member-password-reset-status");
+const passwordResetSubmit = document.querySelector("#member-password-reset-submit");
+const updatePasswordForm = document.querySelector("#member-update-password-form");
+const updatePasswordStatus = document.querySelector("#member-update-password-status");
+const updatePasswordSubmit = document.querySelector("#member-update-password-submit");
+const courseMemberStatus = document.querySelector("#course-member-status");
+const courseMemberTitle = document.querySelector("#course-member-title");
+const courseMemberCopy = document.querySelector("#course-member-copy");
+const courseMemberEyebrow = document.querySelector("#course-member-eyebrow");
+const courseMemberLoginLink = document.querySelector("#course-member-login-link");
+const courseLogoutButton = document.querySelector("#course-logout-button");
+
+const supabaseConfig = window.SANIDHYA_SUPABASE_CONFIG || {};
+const supabaseUrl = (supabaseConfig.url || "").trim();
+const supabaseAnonKey = (supabaseConfig.anonKey || "").trim();
+const hasSupabaseConfig =
+  Boolean(supabaseUrl) &&
+  Boolean(supabaseAnonKey) &&
+  !supabaseUrl.startsWith("PASTE_YOUR_SUPABASE") &&
+  !supabaseAnonKey.startsWith("PASTE_YOUR_SUPABASE");
+const memberAuthClient =
+  hasSupabaseConfig && window.supabase?.createClient
+    ? window.supabase.createClient(supabaseUrl, supabaseAnonKey, {
+        auth: {
+          autoRefreshToken: true,
+          persistSession: true,
+          detectSessionInUrl: true,
+        },
+      })
+    : null;
+
+const setAuthStatusMessage = (statusElement, message, state = "") => {
+  if (!statusElement) {
+    return;
+  }
+
+  statusElement.classList.remove("is-success", "is-error");
+  statusElement.textContent = message;
+
+  if (state) {
+    statusElement.classList.add(state);
+  }
+};
+
+const setAuthButtonLoading = (button, isLoading, loadingText, idleText) => {
+  if (!button) {
+    return;
+  }
+
+  button.disabled = isLoading;
+  button.textContent = isLoading ? loadingText : idleText;
+};
 
 if (memberLoginForm && memberLoginStatus) {
-  memberLoginForm.addEventListener("submit", (event) => {
+  memberLoginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    memberLoginStatus.textContent =
-      "Member login will activate once course accounts are live.";
+
+    if (!memberAuthClient) {
+      setAuthStatusMessage(
+        memberLoginStatus,
+        "Supabase is not connected yet. Add your project URL and anon key in auth-config.js.",
+        "is-error"
+      );
+      return;
+    }
+
+    const loginFormData = new FormData(memberLoginForm);
+    const email = String(loginFormData.get("email") || "").trim();
+    const password = String(loginFormData.get("password") || "");
+
+    if (!email || !password) {
+      setAuthStatusMessage(
+        memberLoginStatus,
+        "Please enter both your email address and password.",
+        "is-error"
+      );
+      return;
+    }
+
+    setAuthButtonLoading(memberLoginSubmit, true, "Signing In...", "Log In");
+    setAuthStatusMessage(memberLoginStatus, "Signing you in...");
+
+    const { data, error } = await memberAuthClient.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    setAuthButtonLoading(memberLoginSubmit, false, "Signing In...", "Log In");
+
+    if (error || !data.session) {
+      setAuthStatusMessage(
+        memberLoginStatus,
+        error?.message || "Could not sign in. Please check your credentials.",
+        "is-error"
+      );
+      return;
+    }
+
+    setAuthStatusMessage(memberLoginStatus, "Signed in. Opening your courses...", "is-success");
+    window.location.href = "./courses";
   });
 }
 
 if (passwordResetForm && passwordResetStatus) {
-  passwordResetForm.addEventListener("submit", (event) => {
+  passwordResetForm.addEventListener("submit", async (event) => {
     event.preventDefault();
-    passwordResetStatus.textContent =
-      "Password reset emails will activate once course accounts are live.";
+
+    if (!memberAuthClient) {
+      setAuthStatusMessage(
+        passwordResetStatus,
+        "Supabase is not connected yet. Add your project URL and anon key in auth-config.js.",
+        "is-error"
+      );
+      return;
+    }
+
+    const resetFormData = new FormData(passwordResetForm);
+    const email = String(resetFormData.get("email") || "").trim();
+
+    if (!email) {
+      setAuthStatusMessage(
+        passwordResetStatus,
+        "Please enter the email address linked to your account.",
+        "is-error"
+      );
+      return;
+    }
+
+    setAuthButtonLoading(
+      passwordResetSubmit,
+      true,
+      "Sending...",
+      "Send Reset Link"
+    );
+    setAuthStatusMessage(passwordResetStatus, "Sending your reset link...");
+
+    const { error } = await memberAuthClient.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/update-password`,
+    });
+
+    setAuthButtonLoading(
+      passwordResetSubmit,
+      false,
+      "Sending...",
+      "Send Reset Link"
+    );
+
+    if (error) {
+      setAuthStatusMessage(
+        passwordResetStatus,
+        error.message || "Could not send a reset link. Please try again.",
+        "is-error"
+      );
+      return;
+    }
+
+    setAuthStatusMessage(
+      passwordResetStatus,
+      "Reset link sent. Please check your inbox.",
+      "is-success"
+    );
+    passwordResetForm.reset();
   });
+}
+
+if (updatePasswordForm && updatePasswordStatus) {
+  updatePasswordForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (!memberAuthClient) {
+      setAuthStatusMessage(
+        updatePasswordStatus,
+        "Supabase is not connected yet. Add your project URL and anon key in auth-config.js.",
+        "is-error"
+      );
+      return;
+    }
+
+    const updateFormData = new FormData(updatePasswordForm);
+    const newPassword = String(updateFormData.get("password") || "");
+
+    if (newPassword.length < 8) {
+      setAuthStatusMessage(
+        updatePasswordStatus,
+        "Your new password should be at least 8 characters long.",
+        "is-error"
+      );
+      return;
+    }
+
+    setAuthButtonLoading(
+      updatePasswordSubmit,
+      true,
+      "Updating...",
+      "Update Password"
+    );
+    setAuthStatusMessage(updatePasswordStatus, "Updating your password...");
+
+    const { error } = await memberAuthClient.auth.updateUser({
+      password: newPassword,
+    });
+
+    setAuthButtonLoading(
+      updatePasswordSubmit,
+      false,
+      "Updating...",
+      "Update Password"
+    );
+
+    if (error) {
+      setAuthStatusMessage(
+        updatePasswordStatus,
+        error.message || "Could not update your password. Please use the latest reset link.",
+        "is-error"
+      );
+      return;
+    }
+
+    setAuthStatusMessage(
+      updatePasswordStatus,
+      "Password updated. Redirecting to your courses...",
+      "is-success"
+    );
+
+    window.setTimeout(() => {
+      window.location.href = "./courses";
+    }, 900);
+  });
+}
+
+if (
+  courseMemberStatus &&
+  courseMemberTitle &&
+  courseMemberCopy &&
+  courseMemberEyebrow &&
+  courseMemberLoginLink
+) {
+  const syncCourseMemberState = async () => {
+    if (!memberAuthClient) {
+      courseMemberEyebrow.textContent = "Member Access";
+      courseMemberTitle.textContent = "Log in to unlock your library";
+      courseMemberCopy.textContent =
+        "Connect Supabase in auth-config.js to activate member sessions and protected course access.";
+      courseMemberLoginLink.hidden = false;
+      courseMemberLoginLink.textContent = "Go to Log In";
+      courseMemberLoginLink.href = "./login";
+      if (courseLogoutButton) {
+        courseLogoutButton.hidden = true;
+      }
+      setAuthStatusMessage(courseMemberStatus, "");
+      return;
+    }
+
+    const { data } = await memberAuthClient.auth.getSession();
+    const memberEmail = data.session?.user?.email || "";
+
+    if (!data.session) {
+      courseMemberEyebrow.textContent = "Member Access";
+      courseMemberTitle.textContent = "Log in to unlock your library";
+      courseMemberCopy.textContent =
+        "Members can access purchased courses and private learning content after signing in.";
+      courseMemberLoginLink.hidden = false;
+      courseMemberLoginLink.textContent = "Go to Log In";
+      courseMemberLoginLink.href = "./login";
+      if (courseLogoutButton) {
+        courseLogoutButton.hidden = true;
+      }
+      setAuthStatusMessage(courseMemberStatus, "Not signed in yet.");
+      return;
+    }
+
+    courseMemberEyebrow.textContent = "Signed In";
+    courseMemberTitle.textContent = "Your course library is ready";
+    courseMemberCopy.textContent =
+      "Your account is active. As courses are published, your purchased lessons can appear here.";
+    courseMemberLoginLink.hidden = true;
+    if (courseLogoutButton) {
+      courseLogoutButton.hidden = false;
+    }
+    setAuthStatusMessage(
+      courseMemberStatus,
+      memberEmail ? `Signed in as ${memberEmail}.` : "Signed in.",
+      "is-success"
+    );
+  };
+
+  syncCourseMemberState();
+
+  if (memberAuthClient) {
+    memberAuthClient.auth.onAuthStateChange(() => {
+      syncCourseMemberState();
+    });
+  }
+
+  if (courseLogoutButton) {
+    courseLogoutButton.addEventListener("click", async () => {
+      if (!memberAuthClient) {
+        return;
+      }
+
+      courseLogoutButton.disabled = true;
+      courseLogoutButton.textContent = "Signing Out...";
+      await memberAuthClient.auth.signOut();
+      courseLogoutButton.disabled = false;
+      courseLogoutButton.textContent = "Log Out";
+      await syncCourseMemberState();
+    });
+  }
 }
 
 const workTitleRail = document.querySelector("#work-title-rail");

@@ -2663,9 +2663,34 @@ h2 {
   text-align: center;
 }
 
+.login-status.is-error {
+  color: rgba(255, 210, 210, 0.95);
+}
+
+.login-status.is-success {
+  color: rgba(223, 244, 230, 0.95);
+}
+
 .login-helper {
   margin-top: 28px;
   text-align: center;
+}
+
+.course-member-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.course-logout-button[hidden] {
+  display: none;
+}
+
+.course-member-status {
+  margin-top: 20px;
+  color: rgba(255, 247, 238, 0.78);
+  line-height: 1.7;
 }
 
 .freebies-status {
