@@ -3203,6 +3203,9 @@ const courseMemberCopy = document.querySelector("#course-member-copy");
 const courseMemberEyebrow = document.querySelector("#course-member-eyebrow");
 const courseMemberLoginLink = document.querySelector("#course-member-login-link");
 const courseLogoutButton = document.querySelector("#course-logout-button");
+const courseVideoPlayer = document.querySelector("#course-video-player");
+const courseVideoLoadButton = document.querySelector("#course-video-load-button");
+const courseVideoStatus = document.querySelector("#course-video-status");
 
 const visiblePasswordIcon = `
   <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -3553,6 +3556,87 @@ if (
       await syncCourseMemberState();
     });
   }
+}
+
+if (courseVideoPlayer && courseVideoLoadButton && courseVideoStatus) {
+  courseVideoLoadButton.addEventListener("click", async () => {
+    if (!memberAuthClient) {
+      setAuthStatusMessage(
+        courseVideoStatus,
+        "Supabase is not connected yet. Add your project URL and anon key in auth-config.js before secure playback can start.",
+        "is-error"
+      );
+      return;
+    }
+
+    const { data } = await memberAuthClient.auth.getSession();
+    const accessToken = data.session?.access_token || "";
+    const lessonId = courseVideoLoadButton.dataset.lessonId || "";
+
+    if (!accessToken) {
+      setAuthStatusMessage(
+        courseVideoStatus,
+        "Please log in first. Redirecting...",
+        "is-error"
+      );
+      window.setTimeout(() => {
+        window.location.href = "./login";
+      }, 700);
+      return;
+    }
+
+    setAuthButtonLoading(
+      courseVideoLoadButton,
+      true,
+      "Requesting Secure URL...",
+      "Load Secure Lesson"
+    );
+    setAuthStatusMessage(courseVideoStatus, "Requesting a temporary R2 playback URL...");
+
+    try {
+      const signedUrlResponse = await fetch(
+        `/api/course-video-link?lesson=${encodeURIComponent(lessonId)}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        }
+      );
+      const signedUrlPayload = await signedUrlResponse.json().catch(() => ({}));
+
+      if (!signedUrlResponse.ok || !signedUrlPayload.videoUrl) {
+        throw new Error(
+          signedUrlPayload.error ||
+            "Could not generate a signed R2 URL for this lesson."
+        );
+      }
+
+      courseVideoPlayer.src = signedUrlPayload.videoUrl;
+      courseVideoPlayer.load();
+
+      setAuthStatusMessage(
+        courseVideoStatus,
+        `Secure lesson loaded. This R2 URL expires in ${Math.ceil(
+          Number(signedUrlPayload.expiresIn || 300) / 60
+        )} minutes.`,
+        "is-success"
+      );
+    } catch (error) {
+      setAuthStatusMessage(
+        courseVideoStatus,
+        error.message || "Could not load this secure lesson right now.",
+        "is-error"
+      );
+    } finally {
+      setAuthButtonLoading(
+        courseVideoLoadButton,
+        false,
+        "Requesting Secure URL...",
+        "Load Secure Lesson"
+      );
+    }
+  });
 }
 
 const workTitleRail = document.querySelector("#work-title-rail");

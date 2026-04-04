@@ -2744,6 +2744,29 @@ h2 {
   line-height: 1.7;
 }
 
+.course-member-status.is-error {
+  color: rgba(255, 210, 210, 0.95);
+}
+
+.course-member-status.is-success {
+  color: rgba(223, 244, 230, 0.95);
+}
+
+.course-video-card {
+  grid-column: span 2;
+}
+
+.course-video-player {
+  display: block;
+  width: 100%;
+  margin-top: 28px;
+  border-radius: 28px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(10, 10, 12, 0.6);
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
 .freebies-status {
   margin: 10px 0 0;
   color: rgba(255, 255, 255, 0.68);
@@ -3448,6 +3471,10 @@ h2 {
   .freebies-unlock-button {
     min-width: 108px;
     padding-inline: 16px;
+  }
+
+  .course-video-card {
+    grid-column: auto;
   }
 
   .login-stage {

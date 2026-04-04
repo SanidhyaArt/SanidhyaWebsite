@@ -71,6 +71,31 @@
             <p>This page is ready for your future paid lessons, course libraries, and member-only learning content.</p>
           </article>
 
+          <article class="detail-card course-video-card">
+            <p class="service-index">Private Lesson</p>
+            <h3>Design course intro</h3>
+            <p>Logged-in members can request a short-lived Cloudflare R2 Standard playback URL for this lesson.</p>
+            <video
+              class="course-video-player"
+              id="course-video-player"
+              controls
+              playsinline
+              preload="none"
+              poster="./assets/images/youtube-thumbnail.webp"
+            ></video>
+            <div class="course-member-actions">
+              <button
+                class="button button-secondary"
+                id="course-video-load-button"
+                type="button"
+                data-lesson-id="design-intro"
+              >
+                Load Secure Lesson
+              </button>
+            </div>
+            <p class="course-member-status" id="course-video-status" aria-live="polite"></p>
+          </article>
+
           <article class="detail-card" id="course-login">
             <p class="service-index" id="course-member-eyebrow">Member Access</p>
             <h3 id="course-member-title">Log in to unlock your library</h3>
