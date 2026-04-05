@@ -2839,6 +2839,12 @@ h2 {
   gap: 20px;
 }
 
+.terms-reader-article {
+  display: grid;
+  gap: 20px;
+  width: 100%;
+}
+
 .terms-heading {
   display: grid;
   place-items: center;

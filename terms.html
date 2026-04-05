@@ -8,6 +8,8 @@
     name="description"
     content="Terms of Service for Sanidhya Singh covering brand identity, logo design, campaign design, illustration, game art, motion, 3D visualization, architectural visualization, and retouching services."
   >
+  <meta name="author" content="Sanidhya Singh">
+  <meta property="og:type" content="article">
   <link rel="stylesheet" href="./styles.css">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml">
@@ -59,29 +61,30 @@
       </video>
       <div class="service-detail-overlay"></div>
       <div class="service-detail-content terms-page-content">
-        <div class="section-heading services-heading terms-heading">
-          <h1>Terms of Service</h1>
-        </div>
+        <article class="terms-reader-article" aria-labelledby="terms-page-title">
+          <header class="section-heading services-heading terms-heading">
+            <h1 id="terms-page-title">Terms of Service</h1>
+          </header>
 
-        <section class="page-hero terms-hero">
-          <p>
-            These terms apply to all design services offered by Sanidhya Singh unless a
-            separate written agreement overrides them. They cover logo design, brand
-            identity, campaign design, illustration,
-            game art, motion design, 3D visualization, architectural visualization,
-            retouching, and related creative services. By approving a proposal, paying a
-            deposit, paying an invoice, or instructing work to begin, the client agrees to
-            be bound by these terms together with any written proposal, scope document,
-            estimate, invoice, or statement of work issued for the project.
-          </p>
-          <p class="terms-fine-print">
-            If a specific proposal, statement of work, or signed agreement conflicts with
-            these terms, that project-specific document will control to the extent of the
-            conflict.
-          </p>
-        </section>
+          <section class="page-hero terms-hero" aria-label="Terms introduction">
+            <p>
+              These terms apply to all design services offered by Sanidhya Singh unless a
+              separate written agreement overrides them. They cover logo design, brand
+              identity, campaign design, illustration,
+              game art, motion design, 3D visualization, architectural visualization,
+              retouching, and related creative services. By approving a proposal, paying a
+              deposit, paying an invoice, or instructing work to begin, the client agrees to
+              be bound by these terms together with any written proposal, scope document,
+              estimate, invoice, or statement of work issued for the project.
+            </p>
+            <p class="terms-fine-print">
+              If a specific proposal, statement of work, or signed agreement conflicts with
+              these terms, that project-specific document will control to the extent of the
+              conflict.
+            </p>
+          </section>
 
-        <section class="terms-layout">
+          <section class="terms-layout" aria-label="Terms sections">
           <div class="terms-stack">
             <article class="detail-card terms-card is-wide" id="acceptance">
               <p class="service-index">01</p>
@@ -324,7 +327,8 @@
               </p>
             </article>
           </div>
-        </section>
+          </section>
+        </article>
       </div>
     </main>
 
