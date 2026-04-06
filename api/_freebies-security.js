@@ -1,4 +1,6 @@
 const crypto = require("node:crypto");
+const fs = require("node:fs");
+const path = require("node:path");
 
 const accessCookieName = "sanidhya_freebies_access";
 const accessTtlSeconds = 15 * 60;
@@ -10,88 +12,59 @@ const botUserAgentPattern =
 
 const requestBuckets = new Map();
 
+const protectedFreebiesDirectory = path.join(process.cwd(), "protected-freebies");
+
 const freebieCatalog = {
   "creative-brief-template": {
     filename: "creative-brief-template.md",
     contentType: "text/markdown; charset=utf-8",
-    body: `# Creative Brief Template
-
-Project name:
-
-Brand / client:
-
-Project goal:
-
-Audience:
-
-Deliverables:
-
-Primary platform(s):
-
-Visual references:
-
-Required tone:
-
-Timeline:
-
-Budget range:
-
-Success metric:
-
-Notes:
-`,
+    filePath: path.join(protectedFreebiesDirectory, "creative-brief-template.md"),
   },
   "brand-audit-checklist": {
     filename: "brand-audit-checklist.md",
     contentType: "text/markdown; charset=utf-8",
-    body: `# Brand Audit Checklist
-
-- Is the logo used consistently across touchpoints?
-- Do typography choices feel aligned and intentional?
-- Is the color palette consistent and recognizable?
-- Do layouts feel balanced, clear, and premium?
-- Are images and illustrations stylistically consistent?
-- Are social graphics visually connected to the brand?
-- Are product or campaign visuals polished enough for launch?
-- Does the brand feel distinct from obvious competitors?
-- Are presentation materials client-facing and refined?
-- What three visual improvements would create the biggest lift?
-`,
+    filePath: path.join(protectedFreebiesDirectory, "brand-audit-checklist.md"),
   },
   "presentation-framework": {
     filename: "presentation-framework.md",
     contentType: "text/markdown; charset=utf-8",
-    body: `# Presentation Framework
-
-1. Title slide
-2. Project / brand context
-3. The problem to solve
-4. Visual direction or strategy
-5. Key references and inspiration
-6. Proposed concept or system
-7. Main deliverables
-8. Application examples
-9. Timeline and next steps
-10. Closing slide / contact
-`,
+    filePath: path.join(protectedFreebiesDirectory, "presentation-framework.md"),
   },
   "launch-asset-checklist": {
     filename: "launch-asset-checklist.md",
     contentType: "text/markdown; charset=utf-8",
-    body: `# Launch Asset Checklist
-
-- Hero visual
-- Social launch graphics
-- Thumbnail / cover image
-- Announcement post assets
-- Presentation deck visuals
-- Landing page visuals
-- Product render or mockup
-- Motion teaser or short animation
-- Press / media graphic
-- Final export set for all required platforms
-`,
+    filePath: path.join(protectedFreebiesDirectory, "launch-asset-checklist.md"),
   },
+  "sanidhyas-check-layers": {
+    filename: "Sanidhya's Check Layers.atn",
+    contentType: "application/octet-stream",
+    filePath: path.join(
+      protectedFreebiesDirectory,
+      "Sanidhya's Check Layers.atn"
+    ),
+  },
+};
+
+const resolveFreebiePayload = (freebie) => {
+  if (!freebie) {
+    return null;
+  }
+
+  if (freebie.filePath && fs.existsSync(freebie.filePath)) {
+    return {
+      ...freebie,
+      body: fs.readFileSync(freebie.filePath),
+    };
+  }
+
+  if (typeof freebie.body === "string") {
+    return {
+      ...freebie,
+      body: Buffer.from(freebie.body, "utf8"),
+    };
+  }
+
+  return null;
 };
 
 const getConfiguredPassword = () =>
@@ -315,7 +288,16 @@ const verifySignedDownloadRequest = (req) => {
     return null;
   }
 
-  return { fileId, ...freebie };
+  const resolvedFreebie = resolveFreebiePayload(freebie);
+
+  if (!resolvedFreebie) {
+    return null;
+  }
+
+  return {
+    fileId,
+    ...resolvedFreebie,
+  };
 };
 
 const readRequestBody = (req) =>
