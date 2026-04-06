@@ -1,7 +1,6 @@
 const {
   assertAllowedUserAgent,
   assertRateLimit,
-  assertSameSiteRequest,
   createSignedDownloadUrl,
   freebieCatalog,
   sendJson,
@@ -17,7 +16,6 @@ module.exports = (req, res) => {
 
   if (
     !assertAllowedUserAgent(req, res) ||
-    !assertSameSiteRequest(req, res) ||
     !assertRateLimit(req, res, { scope: "freebies-links", limit: 60 })
   ) {
     return;
