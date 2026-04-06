@@ -35,6 +35,14 @@ const freebieCatalog = {
     contentType: "text/markdown; charset=utf-8",
     filePath: path.join(protectedFreebiesDirectory, "launch-asset-checklist.md"),
   },
+  "sanidhyas-check-layers": {
+    filename: "Sanidhya's Check Layers.atn",
+    contentType: "application/octet-stream",
+    filePath: path.join(
+      protectedFreebiesDirectory,
+      "Sanidhya's Check Layers.atn"
+    ),
+  },
 };
 
 const resolveFreebiePayload = (freebie) => {
