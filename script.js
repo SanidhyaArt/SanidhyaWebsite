@@ -3143,30 +3143,44 @@ if (hiddenPage && window.sessionStorage.getItem(freebiesAccessKey) !== "true") {
 }
 
 if (hiddenPage && window.sessionStorage.getItem(freebiesAccessKey) === "true") {
+  const freebieDownloadLinks = Array.from(
+    document.querySelectorAll("[data-freebie-download]")
+  );
+  let signedFreebieLinkMap = null;
+
+  const fetchSignedFreebieLinks = async () => {
+    if (signedFreebieLinkMap instanceof Map) {
+      return signedFreebieLinkMap;
+    }
+
+    const linkResponse = await fetch("/api/freebies-links", {
+      method: "GET",
+      credentials: "same-origin",
+    });
+
+    if (!linkResponse.ok) {
+      throw new Error("Could not load signed links");
+    }
+
+    const linkPayload = await linkResponse.json();
+    signedFreebieLinkMap = new Map(
+      (Array.isArray(linkPayload.files) ? linkPayload.files : []).map((fileEntry) => [
+        fileEntry.id,
+        fileEntry.href,
+      ])
+    );
+
+    return signedFreebieLinkMap;
+  };
+
   const hydrateFreebieLinks = async () => {
-    const freebieDownloadLinks = document.querySelectorAll("[data-freebie-download]");
 
     if (!freebieDownloadLinks.length) {
       return;
     }
 
     try {
-      const linkResponse = await fetch("/api/freebies-links", {
-        method: "GET",
-        credentials: "same-origin",
-      });
-
-      if (!linkResponse.ok) {
-        throw new Error("Could not load signed links");
-      }
-
-      const linkPayload = await linkResponse.json();
-      const signedLinkMap = new Map(
-        (Array.isArray(linkPayload.files) ? linkPayload.files : []).map((fileEntry) => [
-          fileEntry.id,
-          fileEntry.href,
-        ])
-      );
+      const signedLinkMap = await fetchSignedFreebieLinks();
 
       freebieDownloadLinks.forEach((link) => {
         const signedHref = signedLinkMap.get(link.dataset.freebieFile || "");
@@ -3184,6 +3198,34 @@ if (hiddenPage && window.sessionStorage.getItem(freebiesAccessKey) === "true") {
       window.location.replace("./freebies");
     }
   };
+
+  freebieDownloadLinks.forEach((link) => {
+    link.addEventListener("click", async (event) => {
+      const currentHref = link.getAttribute("href") || "";
+
+      if (currentHref && currentHref !== "#") {
+        return;
+      }
+
+      event.preventDefault();
+
+      try {
+        const signedLinkMap = await fetchSignedFreebieLinks();
+        const signedHref = signedLinkMap.get(link.dataset.freebieFile || "");
+
+        if (!signedHref) {
+          throw new Error("Missing download link");
+        }
+
+        link.href = signedHref;
+        link.setAttribute("download", "");
+        window.location.href = signedHref;
+      } catch (error) {
+        window.sessionStorage.removeItem(freebiesAccessKey);
+        window.location.replace("./freebies");
+      }
+    });
+  });
 
   hydrateFreebieLinks();
 }
