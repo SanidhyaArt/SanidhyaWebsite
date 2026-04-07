@@ -2764,6 +2764,7 @@ h2 {
   border: 1px solid rgba(255, 255, 255, 0.12);
   background: rgba(10, 10, 12, 0.6);
   aspect-ratio: 16 / 9;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.28);
 }
 
 .course-video-player {
@@ -2791,11 +2792,12 @@ h2 {
 
 .course-video-poster {
   background-image:
-    linear-gradient(180deg, rgba(8, 8, 10, 0.12), rgba(8, 8, 10, 0.76)),
+    linear-gradient(180deg, rgba(8, 8, 10, 0.1), rgba(8, 8, 10, 0.72)),
     var(--course-poster-image, none);
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
+  transform: scale(1.02);
   transition: opacity 260ms ease, transform 260ms ease;
 }
 
@@ -2805,20 +2807,48 @@ h2 {
   gap: 14px;
   padding: clamp(24px, 4vw, 38px);
   background:
-    linear-gradient(180deg, rgba(5, 5, 6, 0.08) 0%, rgba(5, 5, 6, 0.32) 45%, rgba(5, 5, 6, 0.82) 100%);
+    linear-gradient(180deg, rgba(5, 5, 6, 0.04) 0%, rgba(5, 5, 6, 0.26) 42%, rgba(5, 5, 6, 0.88) 100%);
   transition: opacity 260ms ease, visibility 260ms ease;
+}
+
+.course-unlock-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.course-lock-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  background: rgba(14, 14, 18, 0.48);
+  color: rgba(255, 244, 236, 0.88);
+  font-size: 0.76rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  backdrop-filter: blur(12px);
 }
 
 .course-unlock-overlay h4 {
   margin: 0;
-  font-size: clamp(1.25rem, 2vw, 1.75rem);
-  line-height: 1.1;
+  font-size: clamp(1.4rem, 2.3vw, 2rem);
+  line-height: 0.98;
+  max-width: 18ch;
 }
 
 .course-unlock-overlay p:not(.service-index):not(.course-member-status) {
   margin: 0;
-  max-width: 40rem;
+  max-width: 34rem;
   color: rgba(255, 247, 238, 0.84);
+}
+
+.course-unlock-note {
+  font-size: 0.94rem;
+  color: rgba(255, 235, 220, 0.72);
 }
 
 .course-unlock-stage.is-unlocked .course-video-embed {
@@ -3571,6 +3601,11 @@ h2 {
 
   .course-video-card {
     grid-column: auto;
+  }
+
+  .course-unlock-topline {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .login-stage {

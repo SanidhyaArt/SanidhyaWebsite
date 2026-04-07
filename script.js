@@ -3772,7 +3772,7 @@ if (unlockableProductCards.length) {
         purchaseButton,
         true,
         "Opening Checkout...",
-        "Purchase to Unlock"
+        "Unlock Course"
       );
       setAuthStatusMessage(status, "Preparing your secure checkout...");
 
@@ -3876,7 +3876,7 @@ if (unlockableProductCards.length) {
           purchaseButton,
           false,
           "Opening Checkout...",
-          "Purchase to Unlock"
+          "Unlock Course"
         );
       }
     });
