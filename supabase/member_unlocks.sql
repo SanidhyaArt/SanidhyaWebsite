@@ -5,7 +5,7 @@ create table if not exists public.member_unlocks (
   user_id uuid not null references auth.users(id) on delete cascade,
   user_email text,
   product_id text not null,
-  provider text not null default 'stripe',
+  provider text not null default 'razorpay',
   provider_reference text,
   status text not null default 'active',
   metadata jsonb not null default '{}'::jsonb,

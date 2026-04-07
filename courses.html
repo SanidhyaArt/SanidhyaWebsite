@@ -65,19 +65,35 @@
         </section>
 
         <section class="page-grid">
-          <article class="detail-card course-video-card">
+          <article
+            class="detail-card course-video-card unlockable-product-card"
+            data-product-id="course-compositing-photoshop"
+            data-embed-src="https://www.youtube-nocookie.com/embed/ZHAPvrWoFvQ?rel=0&playsinline=1&iv_load_policy=3&hl=en"
+          >
             <p class="service-index">Course</p>
             <h3>Compositing in Photoshop</h3>
             <p>A focused walkthrough on building cleaner composites, controlling layers, and making image work feel more polished and intentional.</p>
-            <iframe
-              class="course-video-player course-video-embed"
-              src="https://www.youtube-nocookie.com/embed/ZHAPvrWoFvQ?rel=0&playsinline=1&iv_load_policy=3&hl=en"
-              title="Compositing in Photoshop"
-              loading="lazy"
-              referrerpolicy="strict-origin-when-cross-origin"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowfullscreen
-            ></iframe>
+            <div class="course-unlock-stage is-locked" style="--course-poster-image: url('./assets/images/youtube-thumbnail.webp');">
+              <div class="course-video-poster" aria-hidden="true"></div>
+              <iframe
+                class="course-video-player course-video-embed"
+                title="Compositing in Photoshop"
+                loading="lazy"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+              ></iframe>
+              <div class="course-unlock-overlay">
+                <p class="service-index">Pay To Unlock</p>
+                <h4>Purchase access to watch this lesson</h4>
+                <p>The video stays locked until this product is purchased on your member account.</p>
+                <div class="course-member-actions">
+                  <a class="button button-secondary course-unlock-login" href="./login?redirect=%2Fcourses">Log In</a>
+                  <button class="button button-primary course-unlock-purchase" type="button">Purchase to Unlock</button>
+                </div>
+                <p class="course-member-status course-unlock-status" aria-live="polite"></p>
+              </div>
+            </div>
           </article>
         </section>
       </div>
@@ -102,6 +118,9 @@
       </div>
     </footer>
   </div>
+  <script src="./auth-config.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script src="./script.js"></script>
 </body>
 </html>

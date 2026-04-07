@@ -12,9 +12,9 @@ const storeCatalog = {
     id: "course-compositing-photoshop",
     type: "course",
     title: "Compositing in Photoshop",
-    successPath: "/courses",
-    cancelPath: "/courses",
-    stripePriceEnv: "SANIDHYA_STRIPE_PRICE_COURSE_COMPOSITING_PHOTOSHOP",
+    description: "A focused walkthrough on cleaner image compositing in Photoshop.",
+    amountEnv: "SANIDHYA_RAZORPAY_AMOUNT_COURSE_COMPOSITING_PHOTOSHOP",
+    currencyEnv: "SANIDHYA_RAZORPAY_CURRENCY_COURSE_COMPOSITING_PHOTOSHOP",
   },
 };
 
@@ -32,17 +32,25 @@ const getSupabaseConfig = () => ({
   ).trim(),
 });
 
-const getStripeConfig = () => ({
-  secretKey: String(process.env.SANIDHYA_STRIPE_SECRET_KEY || "").trim(),
+const getRazorpayConfig = () => ({
+  keyId: String(process.env.SANIDHYA_RAZORPAY_KEY_ID || "").trim(),
+  keySecret: String(process.env.SANIDHYA_RAZORPAY_KEY_SECRET || "").trim(),
   webhookSecret: String(
-    process.env.SANIDHYA_STRIPE_WEBHOOK_SECRET || ""
+    process.env.SANIDHYA_RAZORPAY_WEBHOOK_SECRET || ""
   ).trim(),
 });
 
-const getProductById = (productId) => storeCatalog[String(productId || "").trim()] || null;
+const getProductById = (productId) =>
+  storeCatalog[String(productId || "").trim()] || null;
 
-const getStripePriceIdForProduct = (product) =>
-  String(process.env[product?.stripePriceEnv] || "").trim();
+const getProductAmount = (product) => {
+  const rawAmount = String(process.env[product?.amountEnv] || "").trim();
+  const parsedAmount = Number.parseInt(rawAmount, 10);
+  return Number.isFinite(parsedAmount) && parsedAmount > 0 ? parsedAmount : 0;
+};
+
+const getProductCurrency = (product) =>
+  String(process.env[product?.currencyEnv] || "INR").trim().toUpperCase();
 
 const getBearerToken = (req) => {
   const authorizationHeader = String(req.headers.authorization || "").trim();
@@ -76,31 +84,6 @@ const verifySupabaseSession = async (accessToken) => {
   return authResponse.json();
 };
 
-const getBaseSiteUrl = (req) => {
-  const protocol = String(req.headers["x-forwarded-proto"] || "https")
-    .split(",")[0]
-    .trim();
-  const host = String(req.headers["x-forwarded-host"] || req.headers.host || "")
-    .split(",")[0]
-    .trim();
-
-  return host ? `${protocol}://${host}` : "";
-};
-
-const encodeFormBody = (payload) => {
-  const params = new URLSearchParams();
-
-  Object.entries(payload).forEach(([key, value]) => {
-    if (value === undefined || value === null || value === "") {
-      return;
-    }
-
-    params.set(key, String(value));
-  });
-
-  return params.toString();
-};
-
 const getSupabaseRestHeaders = () => {
   const { serviceRoleKey } = getSupabaseConfig();
 
@@ -119,17 +102,21 @@ const getMemberUnlock = async ({ userId, productId }) => {
   }
 
   const query = new URLSearchParams({
-    select: "product_id,status,user_email,provider,provider_reference,created_at,updated_at",
+    select:
+      "product_id,status,user_email,provider,provider_reference,created_at,updated_at",
     user_id: `eq.${userId}`,
     product_id: `eq.${productId}`,
     status: "eq.active",
     limit: "1",
   });
 
-  const response = await fetch(`${url}/rest/v1/member_unlocks?${query.toString()}`, {
-    method: "GET",
-    headers: getSupabaseRestHeaders(),
-  });
+  const response = await fetch(
+    `${url}/rest/v1/member_unlocks?${query.toString()}`,
+    {
+      method: "GET",
+      headers: getSupabaseRestHeaders(),
+    }
+  );
 
   if (!response.ok) {
     return null;
@@ -143,7 +130,7 @@ const upsertMemberUnlock = async ({
   userId,
   userEmail = "",
   productId,
-  provider = "stripe",
+  provider = "razorpay",
   providerReference = "",
   metadata = {},
 }) => {
@@ -177,92 +164,156 @@ const upsertMemberUnlock = async ({
   return response.ok;
 };
 
-const createStripeCheckoutSession = async ({
-  req,
-  product,
-  user,
-}) => {
-  const { secretKey } = getStripeConfig();
-  const priceId = getStripePriceIdForProduct(product);
-  const baseUrl = getBaseSiteUrl(req);
+const getRazorpayAuthorizationHeader = () => {
+  const { keyId, keySecret } = getRazorpayConfig();
 
-  if (!secretKey || !priceId || !baseUrl) {
+  if (!keyId || !keySecret) {
+    return "";
+  }
+
+  return `Basic ${Buffer.from(`${keyId}:${keySecret}`, "utf8").toString(
+    "base64"
+  )}`;
+};
+
+const createReceipt = (productId, userId) => {
+  const safeProduct = String(productId || "")
+    .replace(/[^a-z0-9]+/gi, "-")
+    .slice(0, 16);
+  const safeUser = String(userId || "")
+    .replace(/[^a-z0-9]+/gi, "")
+    .slice(-10);
+  const timestamp = Date.now().toString(36).slice(-8);
+  return `${safeProduct}-${safeUser}-${timestamp}`.slice(0, 40);
+};
+
+const createRazorpayOrder = async ({ product, user }) => {
+  const authorizationHeader = getRazorpayAuthorizationHeader();
+  const amount = getProductAmount(product);
+  const currency = getProductCurrency(product);
+
+  if (!authorizationHeader || !amount || !currency) {
     return null;
   }
 
-  const successUrl = new URL(product.successPath, baseUrl);
-  successUrl.searchParams.set("purchase", "success");
-  successUrl.searchParams.set("product", product.id);
-
-  const cancelUrl = new URL(product.cancelPath, baseUrl);
-  cancelUrl.searchParams.set("purchase", "cancelled");
-  cancelUrl.searchParams.set("product", product.id);
-
-  const stripeResponse = await fetch("https://api.stripe.com/v1/checkout/sessions", {
+  const response = await fetch("https://api.razorpay.com/v1/orders", {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${secretKey}`,
-      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization: authorizationHeader,
+      "Content-Type": "application/json",
     },
-    body: encodeFormBody({
-      mode: "payment",
-      success_url: successUrl.toString(),
-      cancel_url: cancelUrl.toString(),
-      "line_items[0][price]": priceId,
-      "line_items[0][quantity]": 1,
-      client_reference_id: user.id,
-      customer_email: user.email || "",
-      allow_promotion_codes: "true",
-      "metadata[product_id]": product.id,
-      "metadata[user_id]": user.id,
-      "metadata[user_email]": user.email || "",
+    body: JSON.stringify({
+      amount,
+      currency,
+      receipt: createReceipt(product.id, user.id),
+      notes: {
+        product_id: product.id,
+        product_title: product.title,
+        user_id: user.id,
+        user_email: user.email || "",
+      },
     }),
   });
 
-  if (!stripeResponse.ok) {
-    const stripeError = await stripeResponse.json().catch(() => ({}));
+  if (!response.ok) {
+    const payload = await response.json().catch(() => ({}));
     throw new Error(
-      stripeError?.error?.message || "Could not create the Stripe checkout session."
+      payload?.error?.description ||
+        payload?.error?.reason ||
+        "Could not create the Razorpay order."
     );
   }
 
-  return stripeResponse.json();
+  return response.json();
 };
 
-const verifyStripeSignature = (rawBody, signatureHeader) => {
-  const { webhookSecret } = getStripeConfig();
+const fetchRazorpayOrder = async (orderId) => {
+  const authorizationHeader = getRazorpayAuthorizationHeader();
 
-  if (!webhookSecret || !signatureHeader || !rawBody) {
-    return false;
+  if (!authorizationHeader || !orderId) {
+    return null;
   }
 
-  const parsedSignature = Object.fromEntries(
-    String(signatureHeader)
-      .split(",")
-      .map((entry) => entry.split("=", 2).map((item) => item.trim()))
-      .filter(([key, value]) => key && value)
+  const response = await fetch(
+    `https://api.razorpay.com/v1/orders/${encodeURIComponent(orderId)}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
   );
 
-  const timestamp = parsedSignature.t || "";
-  const signature = parsedSignature.v1 || "";
+  if (!response.ok) {
+    return null;
+  }
 
-  if (!timestamp || !signature) {
+  return response.json();
+};
+
+const fetchRazorpayPayment = async (paymentId) => {
+  const authorizationHeader = getRazorpayAuthorizationHeader();
+
+  if (!authorizationHeader || !paymentId) {
+    return null;
+  }
+
+  const response = await fetch(
+    `https://api.razorpay.com/v1/payments/${encodeURIComponent(paymentId)}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: authorizationHeader,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    return null;
+  }
+
+  return response.json();
+};
+
+const verifyRazorpayPaymentSignature = ({
+  orderId,
+  paymentId,
+  signature,
+}) => {
+  const { keySecret } = getRazorpayConfig();
+
+  if (!keySecret || !orderId || !paymentId || !signature) {
     return false;
   }
 
-  const ageSeconds = Math.abs(Math.floor(Date.now() / 1000) - Number(timestamp));
+  const expectedSignature = crypto
+    .createHmac("sha256", keySecret)
+    .update(`${orderId}|${paymentId}`)
+    .digest("hex");
 
-  if (!Number.isFinite(ageSeconds) || ageSeconds > 300) {
+  const providedBuffer = Buffer.from(String(signature), "utf8");
+  const expectedBuffer = Buffer.from(expectedSignature, "utf8");
+
+  return (
+    providedBuffer.length === expectedBuffer.length &&
+    crypto.timingSafeEqual(providedBuffer, expectedBuffer)
+  );
+};
+
+const verifyRazorpayWebhookSignature = (rawBody, signature) => {
+  const { webhookSecret } = getRazorpayConfig();
+
+  if (!webhookSecret || !rawBody || !signature) {
     return false;
   }
 
   const expectedSignature = crypto
     .createHmac("sha256", webhookSecret)
-    .update(`${timestamp}.${rawBody}`)
+    .update(rawBody)
     .digest("hex");
 
-  const providedBuffer = Buffer.from(signature);
-  const expectedBuffer = Buffer.from(expectedSignature);
+  const providedBuffer = Buffer.from(String(signature), "utf8");
+  const expectedBuffer = Buffer.from(expectedSignature, "utf8");
 
   return (
     providedBuffer.length === expectedBuffer.length &&
@@ -291,17 +342,21 @@ module.exports = {
   assertAllowedUserAgent,
   assertRateLimit,
   assertSameSiteRequest,
-  createStripeCheckoutSession,
+  createRazorpayOrder,
+  fetchRazorpayOrder,
+  fetchRazorpayPayment,
   getBearerToken,
   getMemberUnlock,
+  getProductAmount,
   getProductById,
-  getStripeConfig,
-  getStripePriceIdForProduct,
+  getProductCurrency,
+  getRazorpayConfig,
   getSupabaseConfig,
   readRawRequestBody,
   readRequestBody,
   sendJson,
   upsertMemberUnlock,
-  verifyStripeSignature,
+  verifyRazorpayPaymentSignature,
+  verifyRazorpayWebhookSignature,
   verifySupabaseSession,
 };

@@ -3245,9 +3245,9 @@ const courseMemberCopy = document.querySelector("#course-member-copy");
 const courseMemberEyebrow = document.querySelector("#course-member-eyebrow");
 const courseMemberLoginLink = document.querySelector("#course-member-login-link");
 const courseLogoutButton = document.querySelector("#course-logout-button");
-const courseVideoPlayer = document.querySelector("#course-video-player");
-const courseVideoLoadButton = document.querySelector("#course-video-load-button");
-const courseVideoStatus = document.querySelector("#course-video-status");
+const unlockableProductCards = Array.from(
+  document.querySelectorAll(".unlockable-product-card[data-product-id]")
+);
 
 const visiblePasswordIcon = `
   <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -3343,6 +3343,26 @@ const setAuthButtonLoading = (button, isLoading, loadingText, idleText) => {
   button.textContent = isLoading ? loadingText : idleText;
 };
 
+const getSafeRedirectPath = (fallbackPath = "./courses") => {
+  const redirectParam = new URLSearchParams(window.location.search).get("redirect");
+
+  if (!redirectParam) {
+    return fallbackPath;
+  }
+
+  try {
+    const redirectUrl = new URL(redirectParam, window.location.origin);
+
+    if (redirectUrl.origin !== window.location.origin) {
+      return fallbackPath;
+    }
+
+    return `${redirectUrl.pathname}${redirectUrl.search}${redirectUrl.hash}` || fallbackPath;
+  } catch (error) {
+    return fallbackPath;
+  }
+};
+
 if (memberLoginForm && memberLoginStatus) {
   memberLoginForm.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -3388,8 +3408,8 @@ if (memberLoginForm && memberLoginStatus) {
       return;
     }
 
-    setAuthStatusMessage(memberLoginStatus, "Signed in. Opening your courses...", "is-success");
-    window.location.href = "./courses";
+    setAuthStatusMessage(memberLoginStatus, "Signed in. Opening your library...", "is-success");
+    window.location.href = getSafeRedirectPath("./courses");
   });
 }
 
@@ -3515,7 +3535,7 @@ if (updatePasswordForm && updatePasswordStatus) {
     );
 
     window.setTimeout(() => {
-      window.location.href = "./courses";
+      window.location.href = getSafeRedirectPath("./courses");
     }, 900);
   });
 }
@@ -3600,85 +3620,267 @@ if (
   }
 }
 
-if (courseVideoPlayer && courseVideoLoadButton && courseVideoStatus) {
-  courseVideoLoadButton.addEventListener("click", async () => {
-    if (!memberAuthClient) {
-      setAuthStatusMessage(
-        courseVideoStatus,
-        "Supabase is not connected yet. Add your project URL and anon key in auth-config.js before secure playback can start.",
-        "is-error"
-      );
-      return;
+const fetchMemberProductAccess = async (productId, accessToken) => {
+  const response = await fetch(
+    `/api/store-access?product=${encodeURIComponent(productId)}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
     }
+  );
 
-    const { data } = await memberAuthClient.auth.getSession();
-    const accessToken = data.session?.access_token || "";
-    const lessonId = courseVideoLoadButton.dataset.lessonId || "";
+  const payload = await response.json().catch(() => ({}));
 
-    if (!accessToken) {
-      setAuthStatusMessage(
-        courseVideoStatus,
-        "Please log in first. Redirecting...",
-        "is-error"
-      );
-      window.setTimeout(() => {
-        window.location.href = "./login";
-      }, 700);
-      return;
+  if (!response.ok) {
+    throw new Error(payload.error || "Could not check your access right now.");
+  }
+
+  return payload;
+};
+
+const setUnlockCardState = (card, isUnlocked) => {
+  const stage = card.querySelector(".course-unlock-stage");
+  const iframe = card.querySelector(".course-video-embed");
+  const embedSrc = card.dataset.embedSrc || "";
+
+  if (!stage || !iframe) {
+    return;
+  }
+
+  stage.classList.toggle("is-unlocked", isUnlocked);
+
+  if (isUnlocked) {
+    if (!iframe.src && embedSrc) {
+      iframe.src = embedSrc;
     }
+    return;
+  }
 
-    setAuthButtonLoading(
-      courseVideoLoadButton,
-      true,
-      "Requesting Secure URL...",
-      "Load Secure Lesson"
+  if (iframe.src) {
+    iframe.removeAttribute("src");
+  }
+};
+
+const syncUnlockableProductCard = async (card) => {
+  const productId = card.dataset.productId || "";
+  const status = card.querySelector(".course-unlock-status");
+  const loginLink = card.querySelector(".course-unlock-login");
+  const purchaseButton = card.querySelector(".course-unlock-purchase");
+  const redirectHref = `./login?redirect=${encodeURIComponent(
+    `${window.location.pathname}${window.location.search}${window.location.hash}`
+  )}`;
+
+  if (loginLink) {
+    loginLink.href = redirectHref;
+  }
+
+  if (!productId || !status || !purchaseButton) {
+    return;
+  }
+
+  if (!memberAuthClient) {
+    setUnlockCardState(card, false);
+    setAuthStatusMessage(
+      status,
+      "Member checkout is being configured. Add Supabase to activate login-aware purchases.",
+      "is-error"
     );
-    setAuthStatusMessage(courseVideoStatus, "Requesting a temporary R2 playback URL...");
+    return;
+  }
 
-    try {
-      const signedUrlResponse = await fetch(
-        `/api/course-video-link?lesson=${encodeURIComponent(lessonId)}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-      const signedUrlPayload = await signedUrlResponse.json().catch(() => ({}));
+  const { data } = await memberAuthClient.auth.getSession();
+  const accessToken = data.session?.access_token || "";
 
-      if (!signedUrlResponse.ok || !signedUrlPayload.videoUrl) {
-        throw new Error(
-          signedUrlPayload.error ||
-            "Could not generate a signed R2 URL for this lesson."
+  if (!accessToken) {
+    setUnlockCardState(card, false);
+    setAuthStatusMessage(
+      status,
+      "Log in first, then purchase to unlock this lesson.",
+      ""
+    );
+    return;
+  }
+
+  const accessPayload = await fetchMemberProductAccess(productId, accessToken);
+
+  if (accessPayload.hasAccess) {
+    setUnlockCardState(card, true);
+    setAuthStatusMessage(
+      status,
+      "Unlocked. This lesson is now available on your account.",
+      "is-success"
+    );
+    return;
+  }
+
+  setUnlockCardState(card, false);
+
+  setAuthStatusMessage(
+    status,
+    "This lesson is still locked on your account.",
+    ""
+  );
+};
+
+if (unlockableProductCards.length) {
+  const syncAllUnlockableCards = async () => {
+    for (const card of unlockableProductCards) {
+      await syncUnlockableProductCard(card);
+    }
+  };
+
+  syncAllUnlockableCards();
+
+  if (memberAuthClient) {
+    memberAuthClient.auth.onAuthStateChange(() => {
+      syncAllUnlockableCards();
+    });
+  }
+
+  for (const card of unlockableProductCards) {
+    const purchaseButton = card.querySelector(".course-unlock-purchase");
+    const status = card.querySelector(".course-unlock-status");
+    const productId = card.dataset.productId || "";
+
+    if (!purchaseButton || !status || !productId) {
+      continue;
+    }
+
+    purchaseButton.addEventListener("click", async () => {
+      if (!memberAuthClient) {
+        setAuthStatusMessage(
+          status,
+          "Supabase is not connected yet, so checkout cannot start.",
+          "is-error"
         );
+        return;
       }
 
-      courseVideoPlayer.src = signedUrlPayload.videoUrl;
-      courseVideoPlayer.load();
+      const { data } = await memberAuthClient.auth.getSession();
+      const accessToken = data.session?.access_token || "";
 
-      setAuthStatusMessage(
-        courseVideoStatus,
-        `Secure lesson loaded. This R2 URL expires in ${Math.ceil(
-          Number(signedUrlPayload.expiresIn || 300) / 60
-        )} minutes.`,
-        "is-success"
-      );
-    } catch (error) {
-      setAuthStatusMessage(
-        courseVideoStatus,
-        error.message || "Could not load this secure lesson right now.",
-        "is-error"
-      );
-    } finally {
+      if (!accessToken) {
+        window.location.href = `./login?redirect=${encodeURIComponent(
+          `${window.location.pathname}${window.location.search}${window.location.hash}`
+        )}`;
+        return;
+      }
+
       setAuthButtonLoading(
-        courseVideoLoadButton,
-        false,
-        "Requesting Secure URL...",
-        "Load Secure Lesson"
+        purchaseButton,
+        true,
+        "Opening Checkout...",
+        "Purchase to Unlock"
       );
-    }
-  });
+      setAuthStatusMessage(status, "Preparing your secure checkout...");
+
+      try {
+        const orderResponse = await fetch("/api/create-razorpay-order", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+          body: JSON.stringify({ productId }),
+        });
+
+        const orderPayload = await orderResponse.json().catch(() => ({}));
+
+        if (!orderResponse.ok || !orderPayload.order?.id || !orderPayload.keyId) {
+          throw new Error(
+            orderPayload.error || "Could not open checkout right now."
+          );
+        }
+
+        if (typeof window.Razorpay !== "function") {
+          throw new Error("Razorpay checkout failed to load on this page.");
+        }
+
+        const razorpayCheckout = new window.Razorpay({
+          key: orderPayload.keyId,
+          order_id: orderPayload.order.id,
+          amount: orderPayload.order.amount,
+          currency: orderPayload.order.currency,
+          name: "Sanidhya Singh",
+          description:
+            orderPayload.product?.title || "Course access by Sanidhya Singh",
+          image: "/favicon.svg",
+          prefill: {
+            email: orderPayload.user?.email || "",
+          },
+          theme: {
+            color: "#d4a373",
+          },
+          modal: {
+            ondismiss: () => {
+              setAuthStatusMessage(
+                status,
+                "Checkout was cancelled. You can return anytime to unlock this lesson.",
+                "is-error"
+              );
+            },
+          },
+          handler: async (paymentResponse) => {
+            setAuthStatusMessage(status, "Verifying your payment...");
+
+            try {
+              const verifyResponse = await fetch(
+                "/api/verify-razorpay-payment",
+                {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer ${accessToken}`,
+                  },
+                  body: JSON.stringify({
+                    productId,
+                    razorpay_order_id: paymentResponse.razorpay_order_id,
+                    razorpay_payment_id: paymentResponse.razorpay_payment_id,
+                    razorpay_signature: paymentResponse.razorpay_signature,
+                  }),
+                }
+              );
+
+              const verifyPayload = await verifyResponse.json().catch(() => ({}));
+
+              if (!verifyResponse.ok || !verifyPayload.hasAccess) {
+                throw new Error(
+                  verifyPayload.error ||
+                    "Payment went through, but access could not be activated yet."
+                );
+              }
+
+              await syncUnlockableProductCard(card);
+            } catch (error) {
+              setAuthStatusMessage(
+                status,
+                error.message ||
+                  "Payment went through, but access could not be activated yet.",
+                "is-error"
+              );
+            }
+          },
+        });
+
+        razorpayCheckout.open();
+      } catch (error) {
+        setAuthStatusMessage(
+          status,
+          error.message || "Could not start checkout right now.",
+          "is-error"
+        );
+      } finally {
+        setAuthButtonLoading(
+          purchaseButton,
+          false,
+          "Opening Checkout...",
+          "Purchase to Unlock"
+        );
+      }
+    });
+  }
 }
 
 const workTitleRail = document.querySelector("#work-title-rail");
