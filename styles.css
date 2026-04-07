@@ -2593,18 +2593,18 @@ h2 {
 }
 
 .password-input-shell input {
-  padding-right: 62px;
+  padding-right: 112px;
 }
 
 .password-visibility-toggle {
   position: absolute;
   top: 50%;
-  right: 14px;
+  right: 56px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
+  width: 38px;
+  height: 38px;
   border: 0;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.08);
