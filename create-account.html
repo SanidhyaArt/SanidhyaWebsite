@@ -68,68 +68,68 @@
 
         <section class="login-stage" aria-label="Create account">
           <article class="login-card">
-            <p class="service-index">Member Access</p>
-            <h3>Create your account</h3>
-            <p>Register once to unlock purchased courses, future member downloads, and your growing course library.</p>
+            <div class="account-form-stage" id="create-account-form-stage">
+              <p class="service-index">Member Access</p>
+              <h3>Create your account</h3>
+              <p>Register once to unlock purchased courses, future member downloads, and your growing course library.</p>
 
-            <form class="login-form" id="member-create-account-form" action="#" method="post">
-              <label class="login-field">
-                <span>Full Name</span>
-                <input
-                  type="text"
-                  name="full_name"
-                  placeholder="Sanidhya Singh"
-                  autocomplete="name"
-                >
-              </label>
+              <form class="login-form" id="member-create-account-form" action="#" method="post">
+                <label class="login-field">
+                  <span>Full Name</span>
+                  <input
+                    type="text"
+                    name="full_name"
+                    placeholder="Sanidhya Singh"
+                    autocomplete="name"
+                  >
+                </label>
 
-              <label class="login-field">
-                <span>Email Address</span>
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="you@example.com"
-                  autocomplete="email"
-                  required
-                >
-              </label>
+                <label class="login-field">
+                  <span>Email Address</span>
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="you@example.com"
+                    autocomplete="email"
+                    required
+                  >
+                </label>
 
-              <label class="login-field">
-                <span>Password</span>
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="Create a password"
-                  autocomplete="new-password"
-                  minlength="8"
-                  required
-                >
-              </label>
+                <label class="login-field">
+                  <span>Password</span>
+                  <input
+                    type="password"
+                    name="password"
+                    placeholder="Create a password"
+                    autocomplete="new-password"
+                    minlength="8"
+                    required
+                  >
+                </label>
 
-              <label class="login-field">
-                <span>Confirm Password</span>
-                <input
-                  type="password"
-                  name="confirm_password"
-                  placeholder="Enter your password again"
-                  autocomplete="new-password"
-                  minlength="8"
-                  required
-                >
-              </label>
+                <button class="button button-primary login-submit-button" id="member-create-account-submit" type="submit">Create Account</button>
+                <p class="login-status" id="member-create-account-status" aria-live="polite"></p>
+              </form>
 
-              <button class="button button-primary login-submit-button" id="member-create-account-submit" type="submit">Create Account</button>
-              <p class="login-status" id="member-create-account-status" aria-live="polite"></p>
-            </form>
+              <p class="login-helper">
+                Already have an account?
+                <a href="./login">Log In</a>
+              </p>
+              <p class="login-helper login-helper-secondary">
+                Want to see what you’re unlocking?
+                <a href="./courses">Browse courses</a>
+              </p>
+            </div>
 
-            <p class="login-helper">
-              Already have an account?
-              <a href="./login">Log In</a>
-            </p>
-            <p class="login-helper login-helper-secondary">
-              Want to see what you’re unlocking?
-              <a href="./courses">Browse courses</a>
-            </p>
+            <div class="account-success-stage" id="create-account-success-stage" hidden>
+              <p class="service-index">Account Created</p>
+              <h3>Check your email</h3>
+              <p>We created your member account for <strong id="create-account-success-email"></strong>. Verify it from your inbox, then come back and log in.</p>
+              <div class="section-actions login-actions">
+                <a class="button button-primary" href="./login">Go to Log In</a>
+                <a class="button button-secondary" href="./courses">Browse Courses</a>
+              </div>
+            </div>
           </article>
         </section>
       </div>

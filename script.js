@@ -3243,6 +3243,13 @@ const memberLoginSubmit = document.querySelector("#member-login-submit");
 const createAccountForm = document.querySelector("#member-create-account-form");
 const createAccountStatus = document.querySelector("#member-create-account-status");
 const createAccountSubmit = document.querySelector("#member-create-account-submit");
+const createAccountFormStage = document.querySelector("#create-account-form-stage");
+const createAccountSuccessStage = document.querySelector(
+  "#create-account-success-stage"
+);
+const createAccountSuccessEmail = document.querySelector(
+  "#create-account-success-email"
+);
 const passwordResetForm = document.querySelector("#member-password-reset-form");
 const passwordResetStatus = document.querySelector("#member-password-reset-status");
 const passwordResetSubmit = document.querySelector("#member-password-reset-submit");
@@ -3390,11 +3397,8 @@ if (createAccountForm && createAccountStatus) {
     const fullName = String(createAccountData.get("full_name") || "").trim();
     const email = String(createAccountData.get("email") || "").trim();
     const password = String(createAccountData.get("password") || "");
-    const confirmPassword = String(
-      createAccountData.get("confirm_password") || ""
-    );
 
-    if (!email || !password || !confirmPassword) {
+    if (!email || !password) {
       setAuthStatusMessage(
         createAccountStatus,
         "Please complete every required field before creating your account.",
@@ -3407,15 +3411,6 @@ if (createAccountForm && createAccountStatus) {
       setAuthStatusMessage(
         createAccountStatus,
         "Your password should be at least 8 characters long.",
-        "is-error"
-      );
-      return;
-    }
-
-    if (password !== confirmPassword) {
-      setAuthStatusMessage(
-        createAccountStatus,
-        "Your passwords do not match yet. Please re-enter them.",
         "is-error"
       );
       return;
@@ -3471,10 +3466,21 @@ if (createAccountForm && createAccountStatus) {
 
     setAuthStatusMessage(
       createAccountStatus,
-      "Account created. Check your email to verify it, then log in.",
+      "",
       "is-success"
     );
-    createAccountForm.reset();
+
+    if (createAccountSuccessEmail) {
+      createAccountSuccessEmail.textContent = email;
+    }
+
+    if (createAccountFormStage) {
+      createAccountFormStage.hidden = true;
+    }
+
+    if (createAccountSuccessStage) {
+      createAccountSuccessStage.hidden = false;
+    }
   });
 }
 

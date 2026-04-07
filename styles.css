@@ -2667,6 +2667,24 @@ h2 {
   line-height: 1.7;
 }
 
+.account-form-stage,
+.account-success-stage {
+  width: 100%;
+}
+
+.account-success-stage {
+  display: grid;
+  gap: 18px;
+}
+
+.account-success-stage p {
+  margin-top: 0;
+}
+
+.login-actions {
+  margin-top: 10px;
+}
+
 .login-form {
   display: grid;
   gap: 24px;
