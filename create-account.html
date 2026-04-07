@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Update Password | Sanidhya Singh</title>
+  <title>Create Account | Sanidhya Singh</title>
   <meta
     name="description"
-    content="Create a new password for your Sanidhya Singh course member account."
+    content="Create your Sanidhya Singh member account to unlock purchased courses and future learning resources."
   >
   <link rel="stylesheet" href="./styles.css">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
@@ -63,35 +63,72 @@
 
       <div class="service-detail-content">
         <section class="section-heading services-heading">
-          <h1>UPDATE PASSWORD</h1>
+          <h1>CREATE ACCOUNT</h1>
         </section>
 
-        <section class="login-stage" aria-label="Update password">
+        <section class="login-stage" aria-label="Create account">
           <article class="login-card">
-            <p class="service-index">Account Security</p>
-            <h3>Create a new password</h3>
-            <p>Enter a fresh password to finish account recovery and return to your course library.</p>
+            <p class="service-index">Member Access</p>
+            <h3>Create your account</h3>
+            <p>Register once to unlock purchased courses, future member downloads, and your growing course library.</p>
 
-            <form class="login-form" id="member-update-password-form" action="#" method="post">
+            <form class="login-form" id="member-create-account-form" action="#" method="post">
               <label class="login-field">
-                <span>New Password</span>
+                <span>Full Name</span>
+                <input
+                  type="text"
+                  name="full_name"
+                  placeholder="Sanidhya Singh"
+                  autocomplete="name"
+                >
+              </label>
+
+              <label class="login-field">
+                <span>Email Address</span>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="you@example.com"
+                  autocomplete="email"
+                  required
+                >
+              </label>
+
+              <label class="login-field">
+                <span>Password</span>
                 <input
                   type="password"
                   name="password"
-                  placeholder="Enter a new password"
+                  placeholder="Create a password"
                   autocomplete="new-password"
                   minlength="8"
                   required
                 >
               </label>
 
-              <button class="button button-primary login-submit-button" id="member-update-password-submit" type="submit">Update Password</button>
-              <p class="login-status" id="member-update-password-status" aria-live="polite"></p>
+              <label class="login-field">
+                <span>Confirm Password</span>
+                <input
+                  type="password"
+                  name="confirm_password"
+                  placeholder="Enter your password again"
+                  autocomplete="new-password"
+                  minlength="8"
+                  required
+                >
+              </label>
+
+              <button class="button button-primary login-submit-button" id="member-create-account-submit" type="submit">Create Account</button>
+              <p class="login-status" id="member-create-account-status" aria-live="polite"></p>
             </form>
 
             <p class="login-helper">
-              Already updated?
-              <a href="./login">Back to Log In</a>
+              Already have an account?
+              <a href="./login">Log In</a>
+            </p>
+            <p class="login-helper login-helper-secondary">
+              Want to see what you’re unlocking?
+              <a href="./courses">Browse courses</a>
             </p>
           </article>
         </section>

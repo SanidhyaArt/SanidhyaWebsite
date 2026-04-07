@@ -159,6 +159,13 @@ const predictiveRouteMeta = {
     assets: ["/assets/videos/site-background.mp4"],
     basePriority: 0.66,
   },
+  "/create-account": {
+    id: "page:create-account",
+    category: "Account",
+    tags: ["signup", "create account", "account", "courses", "store"],
+    assets: ["/assets/videos/site-background.mp4"],
+    basePriority: 0.68,
+  },
   "/forgot-password": {
     id: "page:forgot-password",
     category: "Account",
@@ -3233,6 +3240,9 @@ if (hiddenPage && window.sessionStorage.getItem(freebiesAccessKey) === "true") {
 const memberLoginForm = document.querySelector("#member-login-form");
 const memberLoginStatus = document.querySelector("#member-login-status");
 const memberLoginSubmit = document.querySelector("#member-login-submit");
+const createAccountForm = document.querySelector("#member-create-account-form");
+const createAccountStatus = document.querySelector("#member-create-account-status");
+const createAccountSubmit = document.querySelector("#member-create-account-submit");
 const passwordResetForm = document.querySelector("#member-password-reset-form");
 const passwordResetStatus = document.querySelector("#member-password-reset-status");
 const passwordResetSubmit = document.querySelector("#member-password-reset-submit");
@@ -3362,6 +3372,111 @@ const getSafeRedirectPath = (fallbackPath = "./courses") => {
     return fallbackPath;
   }
 };
+
+if (createAccountForm && createAccountStatus) {
+  createAccountForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    if (!memberAuthClient) {
+      setAuthStatusMessage(
+        createAccountStatus,
+        "Supabase is not connected yet. Add your project URL and anon key in auth-config.js.",
+        "is-error"
+      );
+      return;
+    }
+
+    const createAccountData = new FormData(createAccountForm);
+    const fullName = String(createAccountData.get("full_name") || "").trim();
+    const email = String(createAccountData.get("email") || "").trim();
+    const password = String(createAccountData.get("password") || "");
+    const confirmPassword = String(
+      createAccountData.get("confirm_password") || ""
+    );
+
+    if (!email || !password || !confirmPassword) {
+      setAuthStatusMessage(
+        createAccountStatus,
+        "Please complete every required field before creating your account.",
+        "is-error"
+      );
+      return;
+    }
+
+    if (password.length < 8) {
+      setAuthStatusMessage(
+        createAccountStatus,
+        "Your password should be at least 8 characters long.",
+        "is-error"
+      );
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setAuthStatusMessage(
+        createAccountStatus,
+        "Your passwords do not match yet. Please re-enter them.",
+        "is-error"
+      );
+      return;
+    }
+
+    setAuthButtonLoading(
+      createAccountSubmit,
+      true,
+      "Creating Account...",
+      "Create Account"
+    );
+    setAuthStatusMessage(
+      createAccountStatus,
+      "Creating your member account..."
+    );
+
+    const { data, error } = await memberAuthClient.auth.signUp({
+      email,
+      password,
+      options: {
+        data: fullName ? { full_name: fullName } : {},
+        emailRedirectTo: `${window.location.origin}${getSafeRedirectPath(
+          "/courses"
+        )}`,
+      },
+    });
+
+    setAuthButtonLoading(
+      createAccountSubmit,
+      false,
+      "Creating Account...",
+      "Create Account"
+    );
+
+    if (error) {
+      setAuthStatusMessage(
+        createAccountStatus,
+        error.message || "Could not create your account right now.",
+        "is-error"
+      );
+      return;
+    }
+
+    if (data.session) {
+      setAuthStatusMessage(
+        createAccountStatus,
+        "Account created. Opening your courses...",
+        "is-success"
+      );
+      window.location.href = getSafeRedirectPath("./courses");
+      return;
+    }
+
+    setAuthStatusMessage(
+      createAccountStatus,
+      "Account created. Check your email to verify it, then log in.",
+      "is-success"
+    );
+    createAccountForm.reset();
+  });
+}
 
 if (memberLoginForm && memberLoginStatus) {
   memberLoginForm.addEventListener("submit", async (event) => {
