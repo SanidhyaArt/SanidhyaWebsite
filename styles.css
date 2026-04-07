@@ -2731,7 +2731,8 @@ h2 {
   display: flex;
   flex-wrap: wrap;
   gap: 14px;
-  margin-top: 24px;
+  justify-content: center;
+  margin-top: 0;
 }
 
 .course-logout-button[hidden] {
@@ -2739,9 +2740,15 @@ h2 {
 }
 
 .course-member-status {
-  margin-top: 20px;
+  margin-top: 8px;
   color: rgba(255, 247, 238, 0.78);
   line-height: 1.7;
+  max-width: 32rem;
+  text-align: center;
+}
+
+.course-member-status:empty {
+  display: none;
 }
 
 .course-member-status.is-error {
@@ -2803,23 +2810,14 @@ h2 {
 
 .course-unlock-overlay {
   display: grid;
-  align-content: end;
+  align-content: center;
+  justify-items: center;
   gap: 14px;
   padding: clamp(24px, 4vw, 38px);
+  text-align: center;
   background:
     linear-gradient(180deg, rgba(5, 5, 6, 0.04) 0%, rgba(5, 5, 6, 0.26) 42%, rgba(5, 5, 6, 0.88) 100%);
   transition: opacity 260ms ease, visibility 260ms ease;
-}
-
-.course-unlock-overlay p:not(.service-index):not(.course-member-status) {
-  margin: 0;
-  max-width: 34rem;
-  color: rgba(255, 247, 238, 0.84);
-}
-
-.course-unlock-note {
-  font-size: 0.94rem;
-  color: rgba(255, 235, 220, 0.72);
 }
 
 .course-unlock-status {
