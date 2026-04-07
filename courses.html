@@ -65,46 +65,19 @@
         </section>
 
         <section class="page-grid">
-          <article class="detail-card">
-            <p class="service-index">Access</p>
-            <h3>Courses will live here</h3>
-            <p>This page is ready for your future paid lessons, course libraries, and member-only learning content.</p>
-          </article>
-
           <article class="detail-card course-video-card">
-            <p class="service-index">Private Lesson</p>
-            <h3>Design course intro</h3>
-            <p>Logged-in members can request a short-lived Cloudflare R2 Standard playback URL for this lesson.</p>
-            <video
-              class="course-video-player"
-              id="course-video-player"
-              controls
-              playsinline
-              preload="none"
-              poster="./assets/images/youtube-thumbnail.webp"
-            ></video>
-            <div class="course-member-actions">
-              <button
-                class="button button-secondary"
-                id="course-video-load-button"
-                type="button"
-                data-lesson-id="design-intro"
-              >
-                Load Secure Lesson
-              </button>
-            </div>
-            <p class="course-member-status" id="course-video-status" aria-live="polite"></p>
-          </article>
-
-          <article class="detail-card" id="course-login">
-            <p class="service-index" id="course-member-eyebrow">Member Access</p>
-            <h3 id="course-member-title">Log in to unlock your library</h3>
-            <p id="course-member-copy">Members can access purchased courses and private learning content after signing in.</p>
-            <div class="course-member-actions">
-              <a class="button button-secondary" id="course-member-login-link" href="./login">Go to Log In</a>
-              <button class="button button-secondary course-logout-button" id="course-logout-button" type="button" hidden>Log Out</button>
-            </div>
-            <p class="course-member-status" id="course-member-status" aria-live="polite"></p>
+            <p class="service-index">Course</p>
+            <h3>Compositing in Photoshop</h3>
+            <p>A focused walkthrough on building cleaner composites, controlling layers, and making image work feel more polished and intentional.</p>
+            <iframe
+              class="course-video-player course-video-embed"
+              src="https://www.youtube-nocookie.com/embed/ZHAPvrWoFvQ"
+              title="Compositing in Photoshop"
+              loading="lazy"
+              referrerpolicy="strict-origin-when-cross-origin"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowfullscreen
+            ></iframe>
           </article>
         </section>
       </div>
@@ -129,9 +102,6 @@
       </div>
     </footer>
   </div>
-
-  <script src="./auth-config.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="./script.js"></script>
 </body>
 </html>
