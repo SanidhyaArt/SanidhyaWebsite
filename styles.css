@@ -2627,7 +2627,7 @@ h2 {
   outline-offset: 2px;
 }
 
-.password-visibility-toggle span {
+.password-input-shell .password-visibility-toggle span {
   font-family: var(--font-main);
   font-size: 0.96rem;
   font-weight: 500;
