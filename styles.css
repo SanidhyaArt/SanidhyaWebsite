@@ -2596,6 +2596,18 @@ h2 {
   padding-right: 112px;
 }
 
+/* Safari injects a key/contacts icon into password fields.
+   Hide that decoration inside our custom shell so it doesn't collide
+   with the visibility toggle button. */
+.password-input-shell input::-webkit-credentials-auto-fill-button,
+.password-input-shell input::-webkit-contacts-auto-fill-button {
+  visibility: hidden;
+  pointer-events: none;
+  width: 0;
+  height: 0;
+  margin: 0;
+}
+
 .password-visibility-toggle {
   position: absolute;
   top: 50%;
