@@ -3266,23 +3266,6 @@ const unlockableProductCards = Array.from(
   document.querySelectorAll(".unlockable-product-card[data-product-id]")
 );
 
-const visiblePasswordIcon = `
-  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-    <path d="M2.25 12s3.5-6.75 9.75-6.75S21.75 12 21.75 12 18.25 18.75 12 18.75 2.25 12 2.25 12Z"></path>
-    <circle cx="12" cy="12" r="2.75"></circle>
-  </svg>
-`;
-
-const hiddenPasswordIcon = `
-  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-    <path d="M3 3l18 18"></path>
-    <path d="M10.58 10.58A2.74 2.74 0 0 0 12 14.75c.83 0 1.58-.37 2.08-.95"></path>
-    <path d="M7.72 7.73C4.34 9.81 2.25 12 2.25 12s3.5 6.75 9.75 6.75c2.03 0 3.8-.47 5.32-1.2"></path>
-    <path d="M14.3 5.54A10.6 10.6 0 0 0 12 5.25C5.75 5.25 2.25 12 2.25 12s1.17 2.25 3.44 4.27"></path>
-    <path d="M9.88 5.55A11.1 11.1 0 0 1 12 5.25c6.25 0 9.75 6.75 9.75 6.75s-.9 1.73-2.64 3.54"></path>
-  </svg>
-`;
-
 const initializePasswordVisibilityToggles = () => {
   const passwordInputs = document.querySelectorAll('input[type="password"]');
 
@@ -3294,24 +3277,25 @@ const initializePasswordVisibilityToggles = () => {
     const shell = document.createElement("div");
     shell.className = "password-input-shell";
 
-    const toggleButton = document.createElement("button");
-    toggleButton.type = "button";
-    toggleButton.className = "password-visibility-toggle";
-    toggleButton.setAttribute("aria-label", "Show password");
-    toggleButton.innerHTML = visiblePasswordIcon;
+    const toggleLabel = document.createElement("label");
+    toggleLabel.className = "password-visibility-toggle";
+
+    const toggleCheckbox = document.createElement("input");
+    toggleCheckbox.type = "checkbox";
+    toggleCheckbox.className = "password-visibility-checkbox";
+
+    const toggleText = document.createElement("span");
+    toggleText.textContent = "Show password";
+
+    toggleLabel.append(toggleCheckbox, toggleText);
 
     passwordInput.dataset.visibilityToggleReady = "true";
     passwordInput.parentNode.insertBefore(shell, passwordInput);
-    shell.append(passwordInput, toggleButton);
+    shell.append(passwordInput, toggleLabel);
 
-    toggleButton.addEventListener("click", () => {
-      const shouldReveal = passwordInput.type === "password";
+    toggleCheckbox.addEventListener("change", () => {
+      const shouldReveal = toggleCheckbox.checked;
       passwordInput.type = shouldReveal ? "text" : "password";
-      toggleButton.setAttribute(
-        "aria-label",
-        shouldReveal ? "Hide password" : "Show password"
-      );
-      toggleButton.innerHTML = shouldReveal ? hiddenPasswordIcon : visiblePasswordIcon;
       passwordInput.focus({ preventScroll: true });
     });
   });
