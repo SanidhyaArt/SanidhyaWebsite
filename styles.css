@@ -234,13 +234,13 @@ h3 {
 }
 
 .header-account-actions .header-contact-link {
-  position: static;
+  position: relative;
   width: auto;
   min-width: 132px;
 }
 
 .header-account-link {
-  position: static;
+  position: relative;
   min-width: 162px;
   justify-content: center;
   padding-inline: 22px;
