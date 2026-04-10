@@ -2594,48 +2594,12 @@ h2 {
 }
 
 .password-visibility-toggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 16px;
   justify-self: start;
-  width: fit-content;
-  color: rgba(255, 247, 238, 0.9);
-  cursor: pointer;
-  transition:
-    color 180ms ease,
-    opacity 180ms ease;
-}
-
-.password-visibility-toggle:hover {
-  color: #ffffff;
+  white-space: nowrap;
 }
 
 .password-visibility-checkbox {
-  flex: 0 0 18px;
-  width: 18px;
-  height: 18px;
   margin: 0;
-  accent-color: #ffe0b2;
-  cursor: pointer;
-  transform: none;
-}
-
-.password-visibility-checkbox:hover {
-  transform: none;
-}
-
-.password-visibility-checkbox:focus-visible {
-  outline-offset: 2px;
-}
-
-.password-input-shell .password-visibility-toggle span {
-  font-family: var(--font-main);
-  font-size: 0.96rem;
-  font-weight: 500;
-  line-height: 1.2;
-  letter-spacing: normal;
-  text-transform: none;
-  white-space: nowrap;
 }
 
 .login-stage {

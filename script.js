@@ -3278,7 +3278,7 @@ const initializePasswordVisibilityToggles = () => {
     shell.className = "password-input-shell";
 
     const toggleLabel = document.createElement("label");
-    toggleLabel.className = "password-visibility-toggle";
+    toggleLabel.className = "login-remember password-visibility-toggle";
 
     const toggleCheckbox = document.createElement("input");
     toggleCheckbox.type = "checkbox";
