@@ -55,9 +55,22 @@ module.exports = async (req, res) => {
   const razorpayConfig = getRazorpayConfig();
 
   if (!razorpayConfig.keyId || !razorpayConfig.keySecret) {
+    const missingKeys = [];
+
+    if (!razorpayConfig.keyId) {
+      missingKeys.push("SANIDHYA_RAZORPAY_KEY_ID");
+    }
+
+    if (!razorpayConfig.keySecret) {
+      missingKeys.push("SANIDHYA_RAZORPAY_KEY_SECRET");
+    }
+
     sendJson(res, 503, {
-      error:
-        "Razorpay is not configured yet. Add your Razorpay key ID and key secret in Vercel environment variables.",
+      error: `Razorpay is not configured for this deployment yet. Missing: ${missingKeys.join(
+        ", "
+      )}. Runtime env: ${
+        process.env.VERCEL_ENV || process.env.NODE_ENV || "unknown"
+      }.`,
     });
     return;
   }
@@ -66,9 +79,18 @@ module.exports = async (req, res) => {
   const currency = getProductCurrency(product);
 
   if (!amount || !currency) {
+    const missingPricing = [];
+
+    if (!amount) {
+      missingPricing.push(product.amountEnv);
+    }
+
     sendJson(res, 503, {
-      error:
-        "This product is not connected to a valid Razorpay amount yet.",
+      error: `This product is not connected to valid pricing yet. Missing: ${missingPricing.join(
+        ", "
+      )}. Runtime env: ${
+        process.env.VERCEL_ENV || process.env.NODE_ENV || "unknown"
+      }.`,
     });
     return;
   }
