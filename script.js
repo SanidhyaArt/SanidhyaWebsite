@@ -3285,7 +3285,7 @@ const initializePasswordVisibilityToggles = () => {
     toggleCheckbox.className = "password-visibility-checkbox";
 
     const toggleText = document.createElement("span");
-    toggleText.textContent = "Show Password";
+    toggleText.textContent = "Show password";
 
     toggleLabel.append(toggleCheckbox, toggleText);
 
