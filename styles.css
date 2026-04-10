@@ -2597,6 +2597,7 @@ h2 {
   display: inline-flex;
   align-items: center;
   gap: 16px;
+  justify-self: start;
   width: fit-content;
   color: rgba(255, 247, 238, 0.9);
   cursor: pointer;
