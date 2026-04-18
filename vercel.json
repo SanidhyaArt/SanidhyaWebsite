@@ -68,6 +68,13 @@
       ]
     }
   ],
+  "redirects": [
+    {
+      "source": "/brand-identity-systems-work",
+      "destination": "/marketing-visuals",
+      "permanent": false
+    }
+  ],
   "rewrites": [
     {
       "source": "/downloads/(.*)",

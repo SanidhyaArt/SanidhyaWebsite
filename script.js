@@ -252,8 +252,8 @@ const predictiveRouteMeta = {
     id: "service:retouching",
     ...predictivePreviewMeta.retouching,
   },
-  "/brand-identity-systems-work": {
-    id: "work:brand-identity-systems",
+  "/marketing-visuals": {
+    id: "work:marketing-visuals",
     ...predictivePreviewMeta["brand-identity"],
     basePriority: 0.8,
   },
@@ -1453,7 +1453,7 @@ const hindiWorkPages = {
     ],
     relatedItems: [
       { href: "./campaign-visuals", title: "कैंपेन विज़ुअल्स" },
-      { href: "./brand-identity-systems-work", title: "ब्रांड आइडेंटिटी सिस्टम्स" },
+      { href: "./marketing-visuals", title: "मार्केटिंग विज़ुअल्स" },
       { href: "./product-renders", title: "प्रोडक्ट रेंडर्स" },
       { href: "./game-ui-icons", title: "गेम UI और आइकन्स" },
     ],
@@ -1504,7 +1504,7 @@ const hindiWorkPages = {
       },
     ],
     relatedItems: [
-      { href: "./brand-identity-systems-work", title: "ब्रांड आइडेंटिटी सिस्टम्स" },
+      { href: "./marketing-visuals", title: "मार्केटिंग विज़ुअल्स" },
       { href: "./explainer-videos", title: "2D एक्सप्लेनर वीडियोज़" },
       { href: "./product-renders", title: "प्रोडक्ट रेंडर्स" },
       { href: "./editorial-illustration", title: "एडिटोरियल इलस्ट्रेशन" },
@@ -1556,7 +1556,7 @@ const hindiWorkPages = {
       },
     ],
     relatedItems: [
-      { href: "./brand-identity-systems-work", title: "ब्रांड आइडेंटिटी सिस्टम्स" },
+      { href: "./marketing-visuals", title: "मार्केटिंग विज़ुअल्स" },
       { href: "./campaign-visuals", title: "कैंपेन विज़ुअल्स" },
       { href: "./game-ui-icons", title: "गेम UI और आइकन्स" },
       { href: "./explainer-videos", title: "2D एक्सप्लेनर वीडियोज़" },
@@ -1610,7 +1610,7 @@ const hindiWorkPages = {
     relatedItems: [
       { href: "./editorial-illustration", title: "एडिटोरियल इलस्ट्रेशन" },
       { href: "./explainer-videos", title: "2D एक्सप्लेनर वीडियोज़" },
-      { href: "./brand-identity-systems-work", title: "ब्रांड आइडेंटिटी सिस्टम्स" },
+      { href: "./marketing-visuals", title: "मार्केटिंग विज़ुअल्स" },
       { href: "./product-renders", title: "प्रोडक्ट रेंडर्स" },
     ],
   },
@@ -1663,7 +1663,7 @@ const hindiWorkPages = {
       { href: "./product-renders", title: "प्रोडक्ट रेंडर्स" },
       { href: "./campaign-visuals", title: "कैंपेन विज़ुअल्स" },
       { href: "./high-end-retouching", title: "हाई-एंड रिटचिंग" },
-      { href: "./brand-identity-systems-work", title: "ब्रांड आइडेंटिटी सिस्टम्स" },
+      { href: "./marketing-visuals", title: "मार्केटिंग विज़ुअल्स" },
     ],
   },
 };
@@ -1793,7 +1793,7 @@ const buildHighEndRetouchingHindiMarkup = () => `
       </div>
     </article>
   </section>
-  <section class="related-services"><div class="section-heading narrow"><p class="eyebrow">और काम</p><h2>करीबी काम के प्रकार देखें।</h2></div><div class="related-grid"><a class="related-link" href="./product-renders"><p>संबंधित</p><h3>प्रोडक्ट रेंडर्स</h3></a><a class="related-link" href="./campaign-visuals"><p>संबंधित</p><h3>कैंपेन विज़ुअल्स</h3></a><a class="related-link" href="./editorial-illustration"><p>संबंधित</p><h3>एडिटोरियल इलस्ट्रेशन</h3></a><a class="related-link" href="./brand-identity-systems-work"><p>संबंधित</p><h3>ब्रांड आइडेंटिटी सिस्टम्स</h3></a></div></section>
+  <section class="related-services"><div class="section-heading narrow"><p class="eyebrow">और काम</p><h2>करीबी काम के प्रकार देखें।</h2></div><div class="related-grid"><a class="related-link" href="./marketing-visuals"><p>संबंधित</p><h3>मार्केटिंग विज़ुअल्स</h3></a></div></section>
 `;
 
 const buildHindiFreebiesMarkup = () => `
@@ -1908,7 +1908,7 @@ const buildHindiTermsMarkup = () => `
 `;
 
 const hindiPageTemplates = {
-  "/brand-identity-systems-work": {
+  "/marketing-visuals": {
     metaTitle: "ब्रांड आइडेंटिटी सिस्टम्स | Sanidhya Singh",
     metaDescription:
       "लोगो, rollout assets और launch-ready visual systems पर केंद्रित brand identity work का चयन।",
