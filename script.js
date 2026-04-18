@@ -11,8 +11,48 @@ const pageLocale = "en";
 const prefersReducedMotion =
   window.matchMedia?.("(prefers-reduced-motion: reduce)").matches ?? false;
 const analyticsEndpoint = "/api/track";
+const activeServiceSlugs = new Set(["campaign-design", "retouching"]);
+const retiredServiceSlugs = new Set([
+  "brand-identity",
+  "illustration",
+  "game-art",
+  "motion-design",
+  "three-d-visualization",
+  "architectural-visualization",
+]);
+const serviceSlugFromHref = (href) => {
+  if (!href) {
+    return "";
+  }
+
+  const cleanHref = href.split("?")[0].split("#")[0].replace(/\.html$/, "");
+  const segments = cleanHref.split("/").filter(Boolean);
+  return segments.at(-1) || "";
+};
+const currentServiceSlug = serviceSlugFromHref(window.location.pathname);
+
+if (retiredServiceSlugs.has(currentServiceSlug)) {
+  window.location.replace("/services");
+}
+
+document
+  .querySelectorAll('.nav-dropdown[aria-label="Services submenu"] a, .service-list .service-list-item')
+  .forEach((serviceLink) => {
+    const slug = serviceSlugFromHref(serviceLink.getAttribute("href"));
+
+    if (retiredServiceSlugs.has(slug) || (slug && !activeServiceSlugs.has(slug) && serviceLink.classList.contains("service-list-item"))) {
+      serviceLink.remove();
+    }
+  });
+
+document.querySelectorAll(".footer-text").forEach((footerText) => {
+  if (footerText.textContent.includes("identity, campaigns, motion, 3D")) {
+    footerText.textContent =
+      "Campaign visuals and refined imagery for polished commercial presentation.";
+  }
+});
 const backgroundMediaSources = {
-  "brand-identity": "/assets/images/youtube-thumbnail.webp",
+  "brand-identity": "/assets/images/Sneaker.webp",
   "campaign-design": "/assets/images/campaign-design.jpg",
   illustration: "/assets/images/illustration.jpg",
   "game-art": "/assets/images/game-art.jpg",
